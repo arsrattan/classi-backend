@@ -1,0 +1,18 @@
+{
+    "Class": {
+        "AWS": {
+            "region": "us-east-1",
+            "apiVersion": "2012-08-10",
+            "tableName": "Classi-ClassesTable-1294AIY57PWJS",
+            "keys": ["classId"]
+        }
+    },
+    "User": {
+        "AWS": {
+            "region": "us-east-1",
+            "apiVersion": "2012-08-10",
+            "tableName": "Classi-ClassesTable-1294AIY57PWJS",
+            "keys": ["userId"]
+        }
+    }
+}

@@ -1,10 +1,12 @@
-import AccountType from '../enums/AccountType';
+import AccountType from "../../enums/AccountType";
 import Class from './Class';
 
 export default class User {
     firstName: string;
     lastName: string;
-    userName: string;
+    userId: string;
+    password: string;
+    email: string;
     biography: string;
     accountType: AccountType;
     creationDate: Date;
@@ -13,23 +15,27 @@ export default class User {
     followers: User[];
     following: User[];
 
+    constructor(userId: string) {
+        this.userId = userId;
+    }
+
     getFirstName(): string {
         return this.firstName;
     }
 
     followUser(user: User) {
         this.following.push(user);
-        // Update DB
+        // todo update DB
     }
 
     editProfile(newUserName?: string, newBio?: string) {
-        this.userName = newUserName ?? this.userName;
+        this.userId = newUserName ?? this.userId;
         this.biography = newBio ?? this.biography;
-        // Update DB
+        // todo update DB
     }
 
     changeAccountType(newAccountType?: AccountType) {
         this.accountType = newAccountType ?? this.accountType;
-        // Update DB
+        // todo update DB
     }
 }

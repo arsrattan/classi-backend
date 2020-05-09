@@ -2,9 +2,12 @@ import User from "./User";
 import ClassType from "../../enums/ClassType";
 import Equipment from "../../enums/Equipment";
 import Privacy from "../../enums/Privacy";
+import Difficulty from "../../enums/Difficulty";
 import createDocumentClient from "../lib/AWS";
 
 export default class Class {
+
+  classId: string;
   name: string;
   instructor: User;
   description: string;
@@ -14,6 +17,10 @@ export default class Class {
   expectedDuration: string;
   privacy: Privacy;
   scheduledTime: Date;
+
+  constructor(body?: any) {
+
+  }
 
   static documentClient = createDocumentClient("Class");
 

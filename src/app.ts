@@ -1,11 +1,35 @@
-import express, { Request, Response } from 'express';
-const app = express();
-import setRoutes from '../routes/index';
+import express from "express";
+import * as bodyParser from "body-parser";
+import { UserRoutes } from "../routes/userRoutes";
+import {ClassRoutes} from "../routes/classRoutes";
 
-const PORT = 3000;
+class App {
+    public app: express.Application;
 
-app.get('/', (req: Request, res: Response) => res.send('Starting Classi'));
+    constructor() {
+        this.app = express();
+        this.config();
+        this.routes();
+    }
 
-setRoutes(app);
+    public routes(): void {
+        this.app.use("/api/classes", new ClassRoutes().router);
+        this.app.use("/api/users", new UserRoutes().router);
+    }
 
-app.listen(PORT, () => console.log(`Example app listening at http://localhost:${PORT}`));
+    public config(): void {
+        this.app.set("port", process.env.PORT || 3000);
+        this.app.use(express.json());
+        this.app.use(bodyParser.json());
+    }
+
+    public start(): void {
+        this.app.listen(this.app.get("port"), () => {
+            console.log(" API is running at http://localhost:%d", this.app.get("port"));
+        });
+    }
+}
+
+const server = new App();
+
+server.start();

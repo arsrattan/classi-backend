@@ -1,35 +1,32 @@
-import express from "express";
+import express, {Application} from "express";
 import * as bodyParser from "body-parser";
-import { UserRoutes } from "../routes/userRoutes";
-import {ClassRoutes} from "../routes/classRoutes";
-
+import "reflect-metadata";
+import {buildSchema} from "type-graphql";
+import {ApolloServer} from "apollo-server-express";
+import {UserResolver} from "../resolvers/UserResolver";
+import {ClassResolver} from "../resolvers/ClassResolver";
 class App {
-    public app: express.Application;
-
-    constructor() {
-        this.app = express();
-        this.config();
-        this.routes();
+    public config(app: Application): void {
+        app.set("port", process.env.PORT || 3000);
+        app.use(express.json());
+        app.use(bodyParser.json());
     }
 
-    public routes(): void {
-        this.app.use("/api/classes", new ClassRoutes().router);
-        this.app.use("/api/users", new UserRoutes().router);
-    }
+    public async start(): Promise<void> {
+        let app = express();
+        this.config(app);
+        const schema = await buildSchema({
+            resolvers: [UserResolver, ClassResolver],
+            emitSchemaFile: true,
+            validate: false,
+        });
 
-    public config(): void {
-        this.app.set("port", process.env.PORT || 3000);
-        this.app.use(express.json());
-        this.app.use(bodyParser.json());
-    }
-
-    public start(): void {
-        this.app.listen(this.app.get("port"), () => {
-            console.log(" API is running at http://localhost:%d", this.app.get("port"));
+        let graphQlServer = new ApolloServer({schema});
+        graphQlServer.applyMiddleware({app});
+        app.listen(app.get("port"), () => {
+            console.log(" API is running at http://localhost:%d%s", app.get("port"), graphQlServer.graphqlPath);
         });
     }
 }
-
 const server = new App();
-
 server.start();

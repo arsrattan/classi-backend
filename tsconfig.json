@@ -5,7 +5,13 @@
         "preserveConstEnums": true,
         "outDir": "built/",
         "sourceMap": true,
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "target": "es2018",
+        "module": "commonjs",
+        "lib": ["es2018", "esnext.asynciterable"],
+        "types": ["reflect-metadata"],
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true
     },
     "include": [
         "src/**/*"

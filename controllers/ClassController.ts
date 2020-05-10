@@ -1,62 +1,65 @@
 import { Request, Response } from "express";
-import Class from "../src/models/Class";
+import createDocumentClient from "../src/lib/AWS";
+import uniqid from 'uniqid';
+import {Class} from "../entities/Classes";
 
 class ClassController{
 
-    public async listAllClasses(req: Request, res: Response): Promise<void> {
-        //todo et classes from database
-        res.send(['Class1', 'Class2']);
+    public getAllClasses(): Promise<Class[]> {
+        const docClient = createDocumentClient("Class");
+        const params = { TableName: "classesTable" }; //I created this table locally
+        const data = docClient.scan(params).promise();
+        return data.then(res => <Class[]> res.Items)
     };
 
-    public async getClassById(req: Request, res: Response): Promise<void> {
-        //Get the ID from the url
-        const { params } = req;
-        const classId: string = params.classId;
-        //todo et the class from database
-        try {
-            if (+params.classId === 1) {
-                res.send('Class 1 details');
-            } else {
-                res.send('Not Class 1 details');
+    public async getClassById(classId: string): Promise<Class[]> {
+        const docClient = createDocumentClient("Class");
+        const params = {
+            TableName: "classesTable",
+            KeyConditionExpression: 'classId = :i',
+            ExpressionAttributeValues: {
+                ':i': classId
             }
-        } catch (error) {
-            res.status(404).send("Class not found");
-        }
+        };
+        const data = docClient.query(params).promise();
+        return data.then(res => <Class[]> res.Items)
     };
 
-    public async createClass(req: Request, res: Response): Promise<void> {
-        const newClass: Class = new Class(req.body);
-        const classObj = new Class(); //todo get this somehow from DB
-        if (classObj === null) {
-            const result: any = null// todo save it in the DB here
-            if (result === null) {
-                res.sendStatus(500);
-            } else {
-                res.status(201).json({ status: 201, data: result });
+    public async createClass(data: any): Promise<Boolean> {
+        const docClient = createDocumentClient("Class");
+        const classId = uniqid();
+        const params = {
+            TableName: "classesTable",
+            Item: {
+                classId: classId,
+                className: data.className,
+                classType: data.classType
             }
-        } else {
-            res.sendStatus(422);
-        }
+        };
+        const d = docClient.put(params).promise();
+        return d.then(() => true).catch(() => false)
     }
 
     public async updateClass(req: Request, res: Response): Promise<void> {
-        const classObj = new Class(); //todo get this somehow from DB
-        if (classObj === null) {
-            res.sendStatus(404);
-        } else {
-            const updatedClass = { classId: req.params.classId, ...req.body };
-            res.json({ status: res.status, data: updatedClass });
-        }
+        // const classObj = new Class();
+        // if (classObj === null) {
+        //     res.sendStatus(404);
+        // } else {
+        //     const updatedClass = { classId: req.params.classId, ...req.body };
+        //     res.json({ status: res.status, data: updatedClass });
+        // }
     }
 
-    public async deleteClass(req: Request, res: Response): Promise<void> {
-        const classObj = new Class(); //todo get this somehow from DB
-        if (classObj === null) {
-            res.sendStatus(404);
-        } else {
-            res.json({ response: "Class deleted Successfully" });
-        }
+    public async deleteClassById(classId: string): Promise<Boolean> {
+        const docClient = createDocumentClient("Class");
+        const params = {
+            TableName: "classesTable",
+            Key: {"classId": classId}
+        };
+        const data = docClient.delete(params).promise();
+        return data.then(() => true).catch(() => false)
     }
 }
 
 export default ClassController;
+

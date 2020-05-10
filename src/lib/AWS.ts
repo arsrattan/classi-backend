@@ -1,14 +1,15 @@
 import AWS from "aws-sdk";
-import config from "config";
 
-export default function createDocumentClient(
-  model: "Class" | "User"
-): AWS.DynamoDB.DocumentClient {
-  AWS.config.update({
-    region: config.get(`${model}.AWS.region`),
-  });
-  const documentClient = new AWS.DynamoDB.DocumentClient({
-    apiVersion: config.get(`${model}.AWS.apiVersion`),
-  });
-  return documentClient;
+const isDev = process.env.NODE_ENV !== 'production';
+
+export default function createDocumentClient(model: "Class" | "User"): AWS.DynamoDB.DocumentClient {
+  if (isDev) {
+    return new AWS.DynamoDB.DocumentClient({
+      region: "local",
+      endpoint: "http://localhost:8000"
+    });
+  }
+  else {
+    return new AWS.DynamoDB.DocumentClient({});
+  }
 }

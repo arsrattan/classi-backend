@@ -4,7 +4,7 @@ import * as jwt from "jsonwebtoken";
 import bcrypt from "bcrypt-nodejs";
 import {JWT_SECRET} from "../../util/secrets";
 import createDocumentClient from "../lib/AWS";
-import {User} from "../entities/Users";
+import {User} from "../entities/User";
 
 class UserController{
 

@@ -1,9 +1,9 @@
 import { InputType, Field } from "type-graphql";
-import {User} from "../../entities/Users";
+import {User} from "../../entities/User";
 import {IsEmail} from "class-validator";
 import AccountType from "../../enums/AccountType";
 import {GraphQLJSONObject} from "graphql-type-json";
-import {Class} from "../../entities/Classes";
+import {Class} from "../../entities/Class";
 
 @InputType()
 export class UserInput implements Partial<User> {
@@ -22,12 +22,10 @@ export class UserInput implements Partial<User> {
     biography: string;
     @Field({ nullable: true })
     accountType: AccountType;
-    @Field({ nullable: true })
-    creationDate: Date;
     @Field(_type => GraphQLJSONObject, { nullable: true })
     classHistory: Class[];
     @Field(_type => GraphQLJSONObject, { nullable: true })
-    upcomingClasses: Class[];
+    registeredClasses: Class[];
     @Field(_type => GraphQLJSONObject, { nullable: true })
     followers: User[];
     @Field(_type => GraphQLJSONObject, { nullable: true })

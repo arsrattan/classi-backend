@@ -1,8 +1,7 @@
 import {Field, ID, ObjectType} from "type-graphql";
 import { GraphQLJSONObject } from 'graphql-type-json'
 import AccountType from "../enums/AccountType";
-import {Class} from "./Classes";
-
+import {Class} from "./Class";
 
 @ObjectType({ description: "The User model" })
 export class User {
@@ -17,7 +16,7 @@ export class User {
     lastName: string;
     @Field()
     password: string;
-    @Field()
+    @Field({nullable: true})
     biography: string;
     @Field()
     accountType: AccountType;
@@ -26,10 +25,9 @@ export class User {
     @Field(_type => GraphQLJSONObject)
     classHistory: Class[];
     @Field(_type => GraphQLJSONObject)
-    upcomingClasses: Class[];
+    registeredClasses: Class[];
     @Field(_type => GraphQLJSONObject)
     followers: User[];
     @Field(_type => GraphQLJSONObject)
     following: User[];
-
 }

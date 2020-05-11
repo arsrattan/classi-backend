@@ -1,6 +1,6 @@
 import createDocumentClient from "../lib/AWS";
 import uniqid from 'uniqid';
-import {Class} from "../entities/Classes";
+import {Class} from "../entities/Class";
 
 class ClassController{
 

@@ -1,5 +1,5 @@
 import {Arg, Mutation, Query, Resolver} from "type-graphql";
-import {User} from "../entities/Users";
+import {User} from "../entities/User";
 import UserController from "../controllers/UserController";
 import {UserInput} from "./inputs/user-input";
 

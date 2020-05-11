@@ -1,7 +1,7 @@
 import { InputType, Field } from "type-graphql";
-import {Class} from "../../entities/Classes";
+import {Class} from "../../entities/Class";
 import {GraphQLJSONObject} from "graphql-type-json";
-import {User} from "../../entities/Users";
+import {User} from "../../entities/User";
 import ClassType from "../../enums/ClassType";
 import Equipment from "../../enums/Equipment";
 import Difficulty from "../../enums/Difficulty";

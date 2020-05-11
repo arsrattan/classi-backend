@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import AccountType from "../enums/AccountType";
-import {User} from "../entities/Users";
+import {User} from "../entities/User";
 
 export const checkRole = (roles: Array<AccountType>) => {
     return async (req: Request, res: Response, next: NextFunction) => {

@@ -1,5 +1,5 @@
 import {Arg, Mutation, Query, Resolver} from "type-graphql";
-import {Class} from "../entities/Classes";
+import {Class} from "../entities/Class";
 import ClassController from "../controllers/ClassController";
 import {ClassInput} from "./inputs/class-input";
 

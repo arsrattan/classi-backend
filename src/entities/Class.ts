@@ -4,7 +4,7 @@ import Equipment from "../enums/Equipment";
 import Difficulty from "../enums/Difficulty";
 import Privacy from "../enums/Privacy";
 import {GraphQLJSONObject} from "graphql-type-json";
-import {User} from "./Users";
+import {User} from "./User";
 
 @ObjectType({ description: "The Class model" })
 export class Class {

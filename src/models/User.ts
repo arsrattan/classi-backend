@@ -14,6 +14,7 @@ export default class User {
     upcomingClasses: Class[];
     followers: User[];
     following: User[];
+    verifiedStatus: boolean;
 
     constructor(userId: string) {
         this.userId = userId;
@@ -37,5 +38,21 @@ export default class User {
     changeAccountType(newAccountType?: AccountType) {
         this.accountType = newAccountType ?? this.accountType;
         // todo update DB
+    }
+
+    // Check if a user is following another user
+    isFollowing(checkUser: User): boolean {
+        let isFollowingUser:boolean = false;
+
+        for (let userFollowing of this.following) {
+            if (checkUser.userId == userFollowing.userId) {
+                isFollowingUser = true;
+            }
+        }
+        return isFollowingUser;
+    }
+
+    isVerified(): boolean {
+        return this.verifiedStatus;
     }
 }

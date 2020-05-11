@@ -3,9 +3,9 @@ import {Class} from "../entities/Classes";
 
 @InputType()
 export class ClassInput implements Partial<Class> {
-    @Field()
+    @Field({ nullable: true })
     className: string;
-    @Field()
+    @Field({ nullable: true })
     classType: string;
     //add more here, this is just a POC
 }

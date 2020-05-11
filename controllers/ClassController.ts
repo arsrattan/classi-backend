@@ -8,8 +8,8 @@ class ClassController{
     public getAllClasses(): Promise<Class[]> {
         const docClient = createDocumentClient("Class");
         const params = { TableName: "classesTable" }; //I created this table locally
-        const data = docClient.scan(params).promise();
-        return data.then(res => <Class[]> res.Items)
+        const promise = docClient.scan(params).promise();
+        return promise.then(res => <Class[]> res.Items)
     };
 
     public async getClassById(classId: string): Promise<Class[]> {
@@ -21,8 +21,8 @@ class ClassController{
                 ':i': classId
             }
         };
-        const data = docClient.query(params).promise();
-        return data.then(res => <Class[]> res.Items)
+        const promise = docClient.query(params).promise();
+        return promise.then(res => <Class[]> res.Items)
     };
 
     public async createClass(data: any): Promise<Boolean> {
@@ -36,18 +36,30 @@ class ClassController{
                 classType: data.classType
             }
         };
-        const d = docClient.put(params).promise();
-        return d.then(() => true).catch(() => false)
+        const promise = docClient.put(params).promise();
+        return promise.then(() => true).catch(() => false)
     }
 
-    public async updateClass(req: Request, res: Response): Promise<void> {
-        // const classObj = new Class();
-        // if (classObj === null) {
-        //     res.sendStatus(404);
-        // } else {
-        //     const updatedClass = { classId: req.params.classId, ...req.body };
-        //     res.json({ status: res.status, data: updatedClass });
-        // }
+    public async updateClassById(data: any, classId: string): Promise<Boolean> {
+        const docClient = createDocumentClient("Class");
+        let updateExpression = "SET";
+        let expressionAttValues: any = {};
+        //construct an update expression for only the values present in the req
+        //also only want to add present fields to the expression attribute values
+        let keys = Object.keys(data)
+        for(let i = 0; i < keys.length; i++){
+            expressionAttValues[":" + keys[i]] = data[keys[i]];
+            updateExpression += " " + keys[i] + " = :" + keys[i];
+            if(!(i == keys.length - 1)) updateExpression += ",";
+        }
+        const params = {
+            TableName: "classesTable",
+            Key: {"classId": classId},
+            UpdateExpression: updateExpression,
+            ExpressionAttributeValues: expressionAttValues
+        };
+        const promise = docClient.update(params).promise();
+        return promise.then(() => true).catch(() => false)
     }
 
     public async deleteClassById(classId: string): Promise<Boolean> {
@@ -56,8 +68,8 @@ class ClassController{
             TableName: "classesTable",
             Key: {"classId": classId}
         };
-        const data = docClient.delete(params).promise();
-        return data.then(() => true).catch(() => false)
+        const promise = docClient.delete(params).promise();
+        return promise.then(() => true).catch(() => false)
     }
 }
 

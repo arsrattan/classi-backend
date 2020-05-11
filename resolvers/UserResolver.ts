@@ -24,6 +24,12 @@ export class UserResolver {
     };
 
     @Mutation(() => Boolean)
+    async updateUser(@Arg("data") data: UserInput,
+                     @Arg("userId") userId: string) {
+        return await this.userController.updateUser(data, userId);
+    };
+
+    @Mutation(() => Boolean)
     async deleteUserById(@Arg("userId") userId: string) {
         return await this.userController.deleteUserById(userId);
     }

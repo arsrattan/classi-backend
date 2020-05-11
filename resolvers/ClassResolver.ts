@@ -24,6 +24,12 @@ export class ClassResolver {
     };
 
     @Mutation(() => Boolean)
+    async updateClassById(@Arg("data") data: ClassInput,
+                          @Arg("classId") classId: string) {
+        return await this.classController.updateClassById(data, classId);
+    };
+
+    @Mutation(() => Boolean)
     async deleteClassById(@Arg("classId") classId: string) {
         return await this.classController.deleteClassById(classId);
     }

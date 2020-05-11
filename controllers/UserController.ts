@@ -17,8 +17,8 @@ class UserController{
                 email: data.email,
             }
         };
-        const d = docClient.put(params).promise();
-        return d.then(() => true).catch(() => false)
+        const promise = docClient.put(params).promise();
+        return promise.then(() => true).catch(() => false)
         // const hashedPassword = bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(10));
         //
         // //todo write user to DB here
@@ -42,8 +42,8 @@ class UserController{
     public async getAllUsers() {
         const docClient = createDocumentClient("User");
         const params = { TableName: "usersTable" }; //I created this table locally
-        const data = docClient.scan(params).promise();
-        return data.then(res => <User[]> res.Items)
+        const promise = docClient.scan(params).promise();
+        return promise.then(res => <User[]> res.Items)
     }
 
     public async getUserById(userId: string) {
@@ -55,8 +55,30 @@ class UserController{
                 ':i': userId
             }
         };
-        const data = docClient.query(params).promise();
-        return data.then(res => <User[]> res.Items)
+        const promise = docClient.query(params).promise();
+        return promise.then(res => <User[]> res.Items)
+    }
+
+    public async updateUser(data: any, userId: string): Promise<Boolean> {
+        const docClient = createDocumentClient("User");
+        let updateExpression = "SET";
+        let expressionAttValues: any = {};
+        //construct an update expression for only the values present in the req
+        //also only want to add present fields to the expression attribute values
+        let keys = Object.keys(data)
+        for(let i = 0; i < keys.length; i++){
+            expressionAttValues[":" + keys[i]] = data[keys[i]];
+            updateExpression += " " + keys[i] + " = :" + keys[i];
+            if(!(i == keys.length - 1)) updateExpression += ",";
+        }
+        const params = {
+            TableName: "usersTable",
+            Key: {"userId": userId},
+            UpdateExpression: updateExpression,
+            ExpressionAttributeValues: expressionAttValues
+        };
+        const promise = docClient.update(params).promise();
+        return promise.then(() => true).catch(() => false)
     }
 
     public async deleteUserById(userId: string) {
@@ -65,8 +87,8 @@ class UserController{
             TableName: "usersTable",
             Key: {"userId": userId}
         };
-        const data = docClient.delete(params).promise();
-        return data.then(() => true).catch(() => false)
+        const promise = docClient.delete(params).promise();
+        return promise.then(() => true).catch(() => false)
     }
 }
 

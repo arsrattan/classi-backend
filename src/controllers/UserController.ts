@@ -2,20 +2,22 @@ import {NextFunction, Request, Response} from "express";
 import passport from "passport";
 import * as jwt from "jsonwebtoken";
 import bcrypt from "bcrypt-nodejs";
-import {JWT_SECRET} from "../util/secrets";
-import createDocumentClient from "../src/lib/AWS";
+import {JWT_SECRET} from "../../util/secrets";
+import createDocumentClient from "../lib/AWS";
 import {User} from "../entities/Users";
 
 class UserController{
 
     public async registerUser(data: any): Promise<Boolean> {
         const docClient = createDocumentClient("User");
+        let user: any = {};
+        let keys = Object.keys(data)
+        for(let i = 0; i < keys.length; i++){
+            user[keys[i]] = data[keys[i]];
+        }
         const params = {
             TableName: "usersTable",
-            Item: {
-                userId: data.userId,
-                email: data.email,
-            }
+            Item: user
         };
         const promise = docClient.put(params).promise();
         return promise.then(() => true).catch(() => false)

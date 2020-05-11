@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import * as jwt from "jsonwebtoken";
 
-export const checkJwt = (req, res, next) => {
+export const checkJwt = (req: any, res: any, next: any) => {
 
     const secret = "myS33!!creeeT";
 

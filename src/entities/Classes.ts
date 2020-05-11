@@ -14,13 +14,11 @@ export class Class {
     @Field()
     className: string;
     @Field()
-    classType: string;
+    classType: ClassType;
     @Field(_type => GraphQLJSONObject)
     instructor: User;
-    @Field()
+    @Field({ nullable: true })
     description: string;
-    @Field()
-    workoutType: ClassType;
     @Field()
     requiredEquipment: Equipment;
     @Field()

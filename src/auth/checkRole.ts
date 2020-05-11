@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import User from "../src/models/User";
 import AccountType from "../enums/AccountType";
+import {User} from "../entities/Users";
 
 export const checkRole = (roles: Array<AccountType>) => {
     return async (req: Request, res: Response, next: NextFunction) => {
@@ -9,7 +9,7 @@ export const checkRole = (roles: Array<AccountType>) => {
         let user: User;
         try {
             //todo get user role from the database
-            user = new User(userId);
+            //user = new User(userId);
         } catch (userId) {
             res.status(401).send();
         }

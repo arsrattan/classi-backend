@@ -3,8 +3,8 @@ import * as bodyParser from "body-parser";
 import "reflect-metadata";
 import {buildSchema} from "type-graphql";
 import {ApolloServer} from "apollo-server-express";
-import {UserResolver} from "../resolvers/UserResolver";
-import {ClassResolver} from "../resolvers/ClassResolver";
+import {UserResolver} from "./resolvers/UserResolver";
+import {ClassResolver} from "./resolvers/ClassResolver";
 class App {
     public config(app: Application): void {
         app.set("port", process.env.PORT || 3000);

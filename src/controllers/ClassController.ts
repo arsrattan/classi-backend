@@ -1,5 +1,4 @@
-import { Request, Response } from "express";
-import createDocumentClient from "../src/lib/AWS";
+import createDocumentClient from "../lib/AWS";
 import uniqid from 'uniqid';
 import {Class} from "../entities/Classes";
 
@@ -28,13 +27,14 @@ class ClassController{
     public async createClass(data: any): Promise<Boolean> {
         const docClient = createDocumentClient("Class");
         const classId = uniqid();
+        let createdClass: any = {classId: classId};
+        let keys = Object.keys(data)
+        for(let i = 0; i < keys.length; i++){
+            createdClass[keys[i]] = data[keys[i]];
+        }
         const params = {
             TableName: "classesTable",
-            Item: {
-                classId: classId,
-                className: data.className,
-                classType: data.classType
-            }
+            Item: createdClass
         };
         const promise = docClient.put(params).promise();
         return promise.then(() => true).catch(() => false)
@@ -63,6 +63,7 @@ class ClassController{
     }
 
     public async deleteClassById(classId: string): Promise<Boolean> {
+        //todo return something better than a success boolean
         const docClient = createDocumentClient("Class");
         const params = {
             TableName: "classesTable",

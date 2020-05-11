@@ -1,7 +1,7 @@
 import {Arg, Mutation, Query, Resolver} from "type-graphql";
 import {User} from "../entities/Users";
 import UserController from "../controllers/UserController";
-import {UserInput} from "../resolver-inputs/user-input";
+import {UserInput} from "./inputs/user-input";
 
 @Resolver()
 export class UserResolver {

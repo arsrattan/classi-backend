@@ -5,6 +5,7 @@ import {buildSchema} from "type-graphql";
 import {ApolloServer} from "apollo-server-express";
 import {UserResolver} from "./resolvers/UserResolver";
 import {ClassResolver} from "./resolvers/ClassResolver";
+import PostController from "./controllers/PostController";
 class App {
     public config(app: Application): void {
         app.set("port", process.env.PORT || 3000);
@@ -16,7 +17,7 @@ class App {
         let app = express();
         this.config(app);
         const schema = await buildSchema({
-            resolvers: [UserResolver, ClassResolver],
+            resolvers: [UserResolver, ClassResolver, PostController],
             emitSchemaFile: true,
             validate: false,
         });

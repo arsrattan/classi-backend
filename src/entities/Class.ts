@@ -5,6 +5,7 @@ import Difficulty from "../enums/Difficulty";
 import Privacy from "../enums/Privacy";
 import {GraphQLJSONObject} from "graphql-type-json";
 import {User} from "./User";
+import {Comment} from "./Comment";
 
 @ObjectType({ description: "The Class model" })
 export class Class {
@@ -29,4 +30,6 @@ export class Class {
     privacy: Privacy;
     @Field()
     scheduledTime: Date;
+    @Field(_type => GraphQLJSONObject)
+    comments: Comment[];
 }

@@ -6,6 +6,7 @@ import ClassType from "../../enums/ClassType";
 import Equipment from "../../enums/Equipment";
 import Difficulty from "../../enums/Difficulty";
 import Privacy from "../../enums/Privacy";
+import {Comment} from "../../entities/Comment";
 
 @InputType()
 export class ClassInput implements Partial<Class> {
@@ -15,6 +16,10 @@ export class ClassInput implements Partial<Class> {
     classType: ClassType;
     @Field(_type => GraphQLJSONObject, { nullable: true })
     instructor: User;
+    @Field(_type => GraphQLJSONObject)
+    commentToAdd: Comment;
+    @Field(_type => GraphQLJSONObject)
+    commentToDelete: Comment;
     @Field({ nullable: true })
     description: string;
     @Field({ nullable: true })

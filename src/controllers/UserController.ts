@@ -1,19 +1,51 @@
-import {NextFunction, Request, Response} from "express";
-import passport from "passport";
-import * as jwt from "jsonwebtoken";
-import bcrypt from "bcrypt-nodejs";
-import {JWT_SECRET} from "../../util/secrets";
+import bcrypt, {compare, hash} from "bcrypt-nodejs";
 import createDocumentClient from "../lib/AWS";
 import {User} from "../entities/User";
+import {LoginResponse} from "../entities/LoginResponse";
 
 class UserController{
+
+    public async login(data: any): Promise<LoginResponse> {
+        const docClient = createDocumentClient("User");
+        const params = {
+            TableName: "usersTable",
+            KeyConditionExpression: 'userId = :i',
+            ExpressionAttributeValues: {
+                ':i': data.userId
+            }
+        };
+        const promise = docClient.query(params).promise();
+        return promise.then(res => {
+            if(res.Items.length !== 1){
+                throw new Error("Could not find user");
+            }
+            bcrypt.compare(res.Items[0].password, data.password, function(err, res){
+                if (err){
+                    throw new Error("Bad password");
+                }
+                else {
+                    // const refreshToken = sign(data, "wfjongnewgoeng", {expiresIn: "7d"});
+                    // const accessToken = sign(data, "wfjongnewgoeng", {expiresIn: "45min"});
+                }
+            });
+            return { accessToken: "kwhfbefn" }
+        })
+    }
 
     public async registerUser(data: any): Promise<Boolean> {
         const docClient = createDocumentClient("User");
         let user: any = {};
         let keys = Object.keys(data)
         for(let i = 0; i < keys.length; i++){
-            user[keys[i]] = data[keys[i]];
+            if(keys[i] == 'password'){
+                const hashedPassword = hash(data[keys[i]], bcrypt.genSaltSync(13), (err, res) => {
+                    console.log('hash', res)
+                });
+                user[keys[i]] = hashedPassword;
+            }
+            else{
+                user[keys[i]] = data[keys[i]];
+            }
         }
         const params = {
             TableName: "usersTable",
@@ -27,18 +59,6 @@ class UserController{
         //
         // const token = jwt.sign({ username: req.body.userId, scope : req.body.scope }, JWT_SECRET);
         // res.status(200).send({ token: token });
-    }
-
-    public async authenticateUser(req: Request, res: Response, next: NextFunction) {
-        passport.authenticate("local", function (err, user, info) {
-            if (err) return next(err);
-            if (!user) {
-                return res.status(401).json({ status: "error", code: "unauthorized" });
-            } else {
-                const token = jwt.sign({ userId: user.userId }, JWT_SECRET);
-                res.status(200).send({ token: token });
-            }
-        });
     }
 
     public async getAllUsers() {

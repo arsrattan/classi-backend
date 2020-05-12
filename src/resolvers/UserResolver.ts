@@ -2,6 +2,7 @@ import {Arg, Mutation, Query, Resolver} from "type-graphql";
 import {User} from "../entities/User";
 import UserController from "../controllers/UserController";
 import {UserInput} from "./inputs/user-input";
+import {LoginResponse} from "../entities/LoginResponse";
 
 @Resolver()
 export class UserResolver {
@@ -32,6 +33,11 @@ export class UserResolver {
     @Mutation(() => Boolean)
     async deleteUserById(@Arg("userId") userId: string) {
         return await this.userController.deleteUserById(userId);
+    }
+
+    @Mutation(() => LoginResponse)
+    async login(@Arg("data") data: UserInput) {
+        return await this.userController.login(data);
     }
 
 }

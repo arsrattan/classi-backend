@@ -1,4 +1,4 @@
-import {Field, ID, ObjectType} from "type-graphql";
+import {Field, ID, Int, ObjectType} from "type-graphql";
 import {User} from "./User";
 
 @ObjectType({ description: "The Comment model" })
@@ -11,6 +11,6 @@ export class Comment {
     message: string;
     @Field()
     creationDate: Date;
-    @Field()
-    likes: string[]; //list of userids
+    @Field(_type => [String])
+    likes: string[];
 }

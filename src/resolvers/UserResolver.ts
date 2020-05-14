@@ -19,6 +19,23 @@ export class UserResolver {
         return await this.userController.getAllUsers();
     };
 
+    @Query(() => [User], { nullable: true })
+    async getUserFollowers(@Arg("userId") userId: string){
+        return await this.userController.getUserFollowers(userId);
+    };
+
+    @Query(() => Number, { nullable: true })
+    async getNumFollowers(@Arg("userId") userId: string){
+        return await this.userController.getNumFollowers(userId);
+    };
+
+    @Mutation(() => Boolean)
+    async toggleFollow(@Arg("followingUser") followingUser: string,
+                       @Arg("followedUser") followedUser: string,
+                       @Arg("isUnfollow") isUnfollow: boolean){
+        return await this.userController.toggleFollow(followingUser, followedUser, isUnfollow);
+    };
+
     @Mutation(() => Boolean)
     async registerUser(@Arg("data") data: UserInput) {
         return await this.userController.registerUser(data);

@@ -6,7 +6,6 @@ import {ApolloServer} from "apollo-server-express";
 import {UserResolver} from "./resolvers/UserResolver";
 import {ClassResolver} from "./resolvers/ClassResolver";
 import PostController from "./controllers/PostController";
-import {checkJwt} from "./auth/checkJwt";
 
 class App {
     public config(app: Application): void {
@@ -22,7 +21,6 @@ class App {
             resolvers: [UserResolver, ClassResolver, PostController],
             emitSchemaFile: true,
             validate: false,
-            authChecker: checkJwt,
             //authMode: "null",
         });
 

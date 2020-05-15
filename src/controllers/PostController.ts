@@ -67,7 +67,7 @@ class PostController{
         const docClient = createDocumentClient("Post");
         const params = {
             TableName: "postsTable",
-            Key: {"postId": postId}
+            Key: { "postId": postId }
         };
         const promise = docClient.delete(params).promise();
         return promise.then(() => true).catch(() => false)

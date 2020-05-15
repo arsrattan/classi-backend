@@ -159,26 +159,26 @@ class UserController{
             });
     }
 
-    public async toggleFollow(followingUser: string, followedUser: string, isUnfollow: boolean): Promise<Boolean> {
-        let cypher: string =
-            'MATCH (a:User),(b:User) WHERE ' +
-            'a.userId = \'' + followingUser +
-            '\' AND b.userId = \'' + followedUser + '\' ';
-        isUnfollow ?
-            cypher += 'MATCH (a)-[r:FOLLOWS]->(b) DELETE r' : cypher += 'CREATE (a)-[r:FOLLOWS]->(b) RETURN type(r)'
-        const session = this.driver.session()
-        return session.run(cypher)
-            .then(() => {
-                session.close();
-                this.driver.close();
-                return true;
-            })
-            .catch(error => {
-                session.close();
-                console.log(error);
-                this.driver.close()
-                return false;
-            });
+    public async toggleFollow(userId: string, followedUser: string): Promise<Boolean> {
+        if(userId !== followedUser){
+            let cypher: string =
+                'MATCH (u:User), (p:User) WHERE u.userId = ' +
+                '"' + userId + '" AND p.userId = "' + followedUser + '"' +
+                ' CREATE (u)-[:FOLLOWS]->(p) WITH u, p MATCH (u)-[r:FOLLOWS]->(p), (u)-[:FOLLOWS]->(p) DELETE r'
+            const session = this.driver.session()
+            return session.run(cypher)
+                .then(() => {
+                    session.close();
+                    this.driver.close();
+                    return true;
+                })
+                .catch(error => {
+                    session.close();
+                    console.log(error);
+                    this.driver.close()
+                    return false;
+                });
+        }
     }
 
     public async updateUser(data: any, userId: string): Promise<Boolean> {

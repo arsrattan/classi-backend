@@ -1,8 +1,9 @@
-import {Arg, Authorized, Mutation, Query, Resolver} from "type-graphql";
+import {Arg, Mutation, Query, Resolver, UseMiddleware} from "type-graphql";
 import {User} from "../entities/User";
 import UserController from "../controllers/UserController";
 import {UserInput} from "./inputs/user-input";
 import {AuthData} from "../entities/AuthData";
+import {isAuth, isCorrectUser} from "../auth/isAuth";
 
 @Resolver()
 export class UserResolver {
@@ -15,32 +16,35 @@ export class UserResolver {
         return await this.userController.login(email, password);
     };
 
+    @UseMiddleware(isAuth)
     @Query(() => [User], { nullable: true })
     async getUserById(@Arg("userId") userId: string){
         return await this.userController.getUserById(userId);
     };
 
-    @Authorized()
+    @UseMiddleware(isAuth)
     @Query(() => [User], { nullable: true })
     async getAllUsers(){
         return await this.userController.getAllUsers();
     };
 
+    @UseMiddleware(isAuth)
     @Query(() => [User], { nullable: true })
     async getUserFollowers(@Arg("userId") userId: string){
         return await this.userController.getUserFollowers(userId);
     };
 
+    @UseMiddleware(isAuth)
     @Query(() => Number, { nullable: true })
     async getNumFollowers(@Arg("userId") userId: string){
         return await this.userController.getNumFollowers(userId);
     };
 
+    @UseMiddleware(isCorrectUser)
     @Mutation(() => Boolean)
-    async toggleFollow(@Arg("followingUser") followingUser: string,
-                       @Arg("followedUser") followedUser: string,
-                       @Arg("isUnfollow") isUnfollow: boolean){
-        return await this.userController.toggleFollow(followingUser, followedUser, isUnfollow);
+    async toggleFollow(@Arg("userId") userId: string,
+                       @Arg("followedUser") followedUser: string){
+        return await this.userController.toggleFollow(userId, followedUser);
     };
 
     @Mutation(() => Boolean)
@@ -48,12 +52,14 @@ export class UserResolver {
         return await this.userController.registerUser(data);
     };
 
+    @UseMiddleware(isCorrectUser)
     @Mutation(() => Boolean)
     async updateUser(@Arg("data") data: UserInput,
                      @Arg("userId") userId: string) {
         return await this.userController.updateUser(data, userId);
     };
 
+    @UseMiddleware(isCorrectUser)
     @Mutation(() => Boolean)
     async deleteUserById(@Arg("userId") userId: string) {
         return await this.userController.deleteUserById(userId);

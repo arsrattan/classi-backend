@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "npm run build && node built/src/app.js",
+    "start": "npm run build && node built/app.js",
     "build": "tsc"
   },
   "dependencies": {
@@ -23,6 +23,7 @@
     "cookie-parser": "~1.4.4",
     "cypher-query-builder": "^5.0.4",
     "express": "^4.17.1",
+    "express-jwt": "^5.3.3",
     "graphql": "^14.6.0",
     "graphql-tag": "^2.10.1",
     "graphql-tools": "^4.0.4",

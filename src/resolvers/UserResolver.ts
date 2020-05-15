@@ -1,19 +1,26 @@
-import {Arg, Mutation, Query, Resolver} from "type-graphql";
+import {Arg, Authorized, Mutation, Query, Resolver} from "type-graphql";
 import {User} from "../entities/User";
 import UserController from "../controllers/UserController";
 import {UserInput} from "./inputs/user-input";
-import {LoginResponse} from "../entities/LoginResponse";
+import {AuthData} from "../entities/AuthData";
 
 @Resolver()
 export class UserResolver {
 
     public userController: UserController = new UserController();
 
+    @Query(() => AuthData)
+    async login(@Arg("email") email: string,
+                @Arg("password") password: string){
+        return await this.userController.login(email, password);
+    };
+
     @Query(() => [User], { nullable: true })
     async getUserById(@Arg("userId") userId: string){
         return await this.userController.getUserById(userId);
     };
 
+    @Authorized()
     @Query(() => [User], { nullable: true })
     async getAllUsers(){
         return await this.userController.getAllUsers();
@@ -50,11 +57,6 @@ export class UserResolver {
     @Mutation(() => Boolean)
     async deleteUserById(@Arg("userId") userId: string) {
         return await this.userController.deleteUserById(userId);
-    }
-
-    @Mutation(() => LoginResponse)
-    async login(@Arg("data") data: UserInput) {
-        return await this.userController.login(data);
     }
 
 }

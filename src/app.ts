@@ -6,6 +6,8 @@ import {ApolloServer} from "apollo-server-express";
 import {UserResolver} from "./resolvers/UserResolver";
 import {ClassResolver} from "./resolvers/ClassResolver";
 import PostController from "./controllers/PostController";
+import {checkJwt} from "./auth/checkJwt";
+
 class App {
     public config(app: Application): void {
         app.set("port", process.env.PORT || 3000);
@@ -20,9 +22,14 @@ class App {
             resolvers: [UserResolver, ClassResolver, PostController],
             emitSchemaFile: true,
             validate: false,
+            authChecker: checkJwt,
+            //authMode: "null",
         });
 
-        let graphQlServer = new ApolloServer({schema});
+        let graphQlServer = new ApolloServer({schema, context: ({ req }) => {
+                return {req};
+            }
+        });
         graphQlServer.applyMiddleware({app});
         app.listen(app.get("port"), () => {
             console.log(" API is running at http://localhost:%d%s", app.get("port"), graphQlServer.graphqlPath);

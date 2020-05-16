@@ -16,7 +16,7 @@ export class Class {
     className: string;
     @Field()
     classType: ClassType;
-    @Field(_type => GraphQLJSONObject)
+    @Field(_type => GraphQLJSONObject, { nullable: true })//change later
     instructor: User;
     @Field({ nullable: true })
     description: string;

@@ -10,7 +10,7 @@ export class Post {
     @Field(() => ID)
     postId!: string;
     @Field()
-    createdBy: User;
+    creator: User;
     @Field({nullable: true})
     caption: string;
     @Field(_type => GraphQLJSONObject)

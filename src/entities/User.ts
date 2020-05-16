@@ -30,4 +30,6 @@ export class User {
     followers: User[];
     @Field(_type => GraphQLJSONObject)
     following: User[];
+    @Field()
+    confirmed: boolean;
 }

@@ -55,3 +55,17 @@ export const isCorrectUserFromJson: MiddlewareFn<{req: any}> = ({ args, context:
 
     return next();
 };
+
+export const isCorrectUserFromConfirmation: MiddlewareFn<{req: any}> = ({ args}, next) => {
+    const token = args['token'];
+    if(!token || token == '') throw new Error('Not authorized!');
+    let decodedToken;
+    try {
+        decodedToken = jwt.verify(token, "wefgeijgne"); // need to move the key
+    }
+    catch (err) {
+        throw new Error('Not authorized!');
+    }
+    if(!decodedToken || decodedToken.userId == null) throw new Error('Not authorized!');
+    return next();
+};

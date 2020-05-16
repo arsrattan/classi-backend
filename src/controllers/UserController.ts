@@ -4,6 +4,7 @@ import {User} from "../entities/User";
 import * as neo4j from 'neo4j-driver'
 import {AuthData} from "../entities/AuthData";
 import {Driver} from "neo4j-driver/types/v1/driver";
+import {sendEmail} from "../util/sendEmail";
 
 class UserController{
     //import this from elsewhere
@@ -22,15 +23,46 @@ class UserController{
                 if(result.records.length == 0) throw new Error('User does not exist!');
                 let user = result.records[0]["_fields"][0]['properties'];
                 const isEqual = bcrypt.compareSync(password, user.password);
-                if(isEqual) {
+                if(!isEqual) {
+                    this.driver.close();
+                    throw new Error('Incorrect password!');
+                }
+                else if(!user.confirmed){
+                    throw new Error('Please confirm your email.');
+                }
+                else {
                     const token = jwt.sign({userId: user.userId, email: user.email}, this.privateKey,{expiresIn: '1h'});
                     this.driver.close();
                     return { accessToken: token, userId: user.userId, expirationInHours: 1 }
                 }
-                else {
-                    this.driver.close();
-                    throw new Error('Incorrect password!');
-                }
+            })
+            .catch(error => {
+                session.close();
+                console.log(error);
+                this.driver.close()
+                return error;
+            });
+    }
+
+    public async confirmUser(token: string): Promise<Boolean> {
+        let decodedToken;
+        try {
+            decodedToken = jwt.verify(token, "wefgeijgne"); // need to move the key
+        }
+        catch (err) {
+            throw new Error('Not authorized!');
+        }
+        if(!decodedToken || decodedToken.userId == null) throw new Error('Not authorized!');
+        let cypher: string =
+            'MATCH (n:User) WHERE n.userId = "' + decodedToken.userId + '" ' +
+            'SET n.confirmed = true ' +
+            'RETURN n';
+        const session = this.driver.session()
+        return session.run(cypher)
+            .then(() => {
+                session.close();
+                this.driver.close();
+                return true;
             })
             .catch(error => {
                 session.close();
@@ -70,6 +102,7 @@ class UserController{
             .then(() => {
                 session.close();
                 this.driver.close();
+                sendEmail("mjhadjri@gmail.com", data['userId']);
                 return true;
             })
             .catch(error => {

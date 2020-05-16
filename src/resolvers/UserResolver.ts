@@ -3,7 +3,7 @@ import {User} from "../entities/User";
 import UserController from "../controllers/UserController";
 import {UserInput} from "./inputs/user-input";
 import {AuthData} from "../entities/AuthData";
-import {isAuth, isCorrectUser} from "../auth/isAuth";
+import {isAuth, isCorrectUser, isCorrectUserFromConfirmation} from "../auth/isAuth";
 
 @Resolver()
 export class UserResolver {
@@ -50,6 +50,12 @@ export class UserResolver {
     @Mutation(() => Boolean)
     async registerUser(@Arg("data") data: UserInput) {
         return await this.userController.registerUser(data);
+    };
+
+    @UseMiddleware(isCorrectUserFromConfirmation)
+    @Mutation(() => Boolean)
+    async confirmUser(@Arg("token") token: string) {
+        return await this.userController.confirmUser(token);
     };
 
     @UseMiddleware(isCorrectUser)

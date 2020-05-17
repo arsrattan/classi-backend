@@ -1,10 +1,6 @@
 import nodemailer from "nodemailer";
-import * as jwt from "jsonwebtoken";
 
-export async function sendEmail(email: string, userId: string) {
-
-    const token = jwt.sign({userId: userId}, "wefgeijgne",{expiresIn: '1h'});
-    const url = `http://localhost:3000/user/confirm/${token}`
+export async function sendEmail(email: string, url: string) {
 
     const testAccount = await nodemailer.createTestAccount();
 

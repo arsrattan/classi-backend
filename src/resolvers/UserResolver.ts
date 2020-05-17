@@ -58,6 +58,18 @@ export class UserResolver {
         return await this.userController.confirmUser(token);
     };
 
+    //@UseMiddleware(isCorrectUserFromConfirmation)
+    @Mutation(() => Boolean)
+    async changePassword(@Arg("token") token: string,
+                         @Arg("password") password: string) {
+        return await this.userController.changePassword(token, password);
+    };
+
+    @Mutation(() => Boolean)
+    async forgotPassword(@Arg("email") email: string) {
+        return await this.userController.forgotPassword(email);
+    };
+
     @UseMiddleware(isCorrectUser)
     @Mutation(() => Boolean)
     async updateUser(@Arg("data") data: UserInput,

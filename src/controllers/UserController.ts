@@ -5,6 +5,7 @@ import * as neo4j from 'neo4j-driver'
 import {AuthData} from "../entities/AuthData";
 import {Driver} from "neo4j-driver/types/v1/driver";
 import {sendEmail} from "../util/sendEmail";
+import {confirmUserPrefix, forgotPasswordPrefix} from "../util/tokenConstants";
 
 class UserController{
     //import this from elsewhere
@@ -45,9 +46,15 @@ class UserController{
     }
 
     public async confirmUser(token: string): Promise<Boolean> {
+        if(!token.startsWith(confirmUserPrefix)){
+            throw new Error('Incorrect token type!')
+        }
+        const tokenConent = token.substring(token.indexOf(":"))
+        console.log(token);
+        console.log(tokenConent)
         let decodedToken;
         try {
-            decodedToken = jwt.verify(token, "wefgeijgne"); // need to move the key
+            decodedToken = jwt.verify(tokenConent, "wefgeijgne"); // need to move the key
         }
         catch (err) {
             throw new Error('Not authorized!');
@@ -72,18 +79,56 @@ class UserController{
             });
     }
 
-    public async registerUser(data: any): Promise<Boolean> {
-        function hashPassword() {
-            return new Promise((resolve, reject) => {
-                bcrypt.genSalt(12, (error, salt) => {
-                    if (error) return reject(error);
-                    bcrypt.hash(data['password'], salt, null,
-                        (error, hash) => error ? reject(error) : resolve(hash)
-                    );
-                });
-            });
+    public async changePassword(token: string, password: string): Promise<Boolean> {
+        if(!token.startsWith(forgotPasswordPrefix)){
+            throw new Error('Incorrect token type!')
         }
-        const hash = await(hashPassword());
+        const tokenConent = token.substring(token.indexOf(":"))
+        console.log(token);
+        console.log(tokenConent)
+        let decodedToken;
+        try {
+            decodedToken = jwt.verify(tokenConent, "wefgeijgne"); // need to move the key
+        }
+        catch (err) {
+            throw new Error('Not authorized!');
+        }
+        if(!decodedToken || decodedToken.userId == null) throw new Error('Not authorized!');
+        const hashedPassword = await(this.hashPassword(password));
+        if(hashedPassword !== null){
+            let cypher: string =
+                'MATCH (n:User) WHERE n.userId = "' + decodedToken.userId + '" ' +
+                'SET n.password = ' + hashedPassword + ' ' +
+                'RETURN n';
+            const session = this.driver.session()
+            return session.run(cypher)
+                .then(() => {
+                    session.close();
+                    this.driver.close();
+                    return true;
+                })
+                .catch(error => {
+                    session.close();
+                    console.log(error);
+                    this.driver.close()
+                    return error;
+                });
+        }
+    }
+
+    public async hashPassword(password: string) {
+        return new Promise((resolve, reject) => {
+            bcrypt.genSalt(12, (error, salt) => {
+                if (error) return reject(error);
+                bcrypt.hash(password, salt, null,
+                    (error, hash) => error ? reject(error) : resolve(hash)
+                );
+            });
+        });
+    }
+
+    public async registerUser(data: any): Promise<Boolean> {
+        const hash = await(this.hashPassword(data['password']));
         let cypher = "CREATE (n:User { "
         let keys = Object.keys(data)
         //there is probably a better way to do this
@@ -102,7 +147,10 @@ class UserController{
             .then(() => {
                 session.close();
                 this.driver.close();
-                sendEmail("mjhadjri@gmail.com", data['userId']);
+                const token = confirmUserPrefix
+                    + ":" + jwt.sign({userId: data['userId']}, "wefgeijgne",{expiresIn: '1h'});
+                const url = `http://localhost:3000/user/confirm/${token}`
+                sendEmail("mjhadjri@gmail.com", url);
                 return true;
             })
             .catch(error => {
@@ -110,6 +158,30 @@ class UserController{
                 console.log(error);
                 this.driver.close()
                 return false;
+            });
+    }
+
+    public async forgotPassword(email: string): Promise<Boolean> {
+        const session = this.driver.session()
+        return session.run('MATCH (n { email: \'' + email + '\' }) RETURN n')
+            .then(result => {
+                session.close();
+                if(result.records.length !== 1){
+                    return true; //dont want to notify that the email doesnt exist for security reasons
+                }
+                const user = result.records[0].toObject()["n"]["properties"]
+                const token = forgotPasswordPrefix
+                    + ":" + jwt.sign({userId: user.userId}, "wefgeijgne",{expiresIn: '1h'});
+                const url = `http://localhost:3000/user/change-password/${token}`
+                sendEmail(email, url);
+                this.driver.close();
+                return true;
+            })
+            .catch(error => {
+                session.close();
+                console.log(error);
+                this.driver.close()
+                return error;
             });
     }
 

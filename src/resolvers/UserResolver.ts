@@ -1,9 +1,33 @@
-import {Arg, Mutation, Query, Resolver, UseMiddleware} from "type-graphql";
+import {
+    Arg,
+    Args, ArgsType, Field, ID,
+    Mutation,
+    Publisher,
+    PubSub,
+    Query,
+    Resolver,
+    ResolverFilterData,
+    Root,
+    Subscription,
+    UseMiddleware
+} from "type-graphql";
 import {User} from "../entities/User";
 import UserController from "../controllers/UserController";
 import {UserInput} from "./inputs/user-input";
 import {AuthData} from "../entities/AuthData";
 import {isAuth, isCorrectUser, isCorrectUserFromConfirmation} from "../auth/isAuth";
+import {Topic} from "../subscriptions/topics";
+import {GraphQLJSONObject} from "graphql-type-json";
+
+export interface NewClassPayload {
+    message: string;
+}
+
+@ArgsType()
+export class NewClassArgs {
+    @Field(type => ID)
+    recipeId: string;
+}
 
 @Resolver()
 export class UserResolver {
@@ -48,8 +72,13 @@ export class UserResolver {
     };
 
     @Mutation(() => Boolean)
-    async registerUser(@Arg("data") data: UserInput) {
-        return await this.userController.registerUser(data);
+    async registerUser(@Arg("data") data: UserInput,
+                       @PubSub(Topic.NewClass) notifyGotClasses: Publisher<NewClassPayload>) {
+        const isRegistered: Boolean = await this.userController.registerUser(data);
+        if(isRegistered.valueOf() == true){
+            await notifyGotClasses({ message: "yah" })
+        }
+        return isRegistered;
     };
 
     @UseMiddleware(isCorrectUserFromConfirmation)
@@ -58,7 +87,7 @@ export class UserResolver {
         return await this.userController.confirmUser(token);
     };
 
-    //@UseMiddleware(isCorrectUserFromConfirmation)
+    @UseMiddleware(isCorrectUserFromConfirmation)
     @Mutation(() => Boolean)
     async changePassword(@Arg("token") token: string,
                          @Arg("password") password: string) {
@@ -81,6 +110,18 @@ export class UserResolver {
     @Mutation(() => Boolean)
     async deleteUserById(@Arg("userId") userId: string) {
         return await this.userController.deleteUserById(userId);
+    }
+
+    @Subscription(() => GraphQLJSONObject, {
+        topics: Topic.NewClass,
+        // filter: ({ payload, args }: ResolverFilterData<NewClassPayload, NewClassArgs>) => {
+        //     return payload.message === args.recipeId;
+        // },
+    })
+    newComments(@Root() newComment: NewClassPayload): any {
+        return {
+            message: 'testing123123',
+        };
     }
 
 }

@@ -1,25 +1,20 @@
-import {InputType, Field, ID} from "type-graphql";
+import {InputType, Field} from "type-graphql";
 import {Class} from "../../entities/Class";
 import {GraphQLJSONObject} from "graphql-type-json";
-import {User} from "../../entities/User";
 import ClassType from "../../enums/ClassType";
 import Equipment from "../../enums/Equipment";
 import Difficulty from "../../enums/Difficulty";
-import Privacy from "../../enums/Privacy";
 import {Comment} from "../../entities/Comment";
-import {UserInput} from "./user-input";
 
 @InputType()
-export class ClassInput implements Partial<Class> {
+export class UpdateClassInput implements Partial<Class> {
 
-    @Field(() => ID, { nullable: true })
-    classId: string;
+    @Field()
+    instructorUserId: string;
     @Field({ nullable: true })
     className: string;
     @Field({ nullable: true })
     classType: ClassType;
-    @Field(_type => UserInput, { nullable: true })
-    instructor: User;
     @Field(_type => GraphQLJSONObject, { nullable: true })
     commentToAdd: Comment;
     @Field(_type => GraphQLJSONObject, { nullable: true })
@@ -33,7 +28,29 @@ export class ClassInput implements Partial<Class> {
     @Field({ nullable: true })
     expectedDuration: string;
     @Field({ nullable: true })
-    privacy: Privacy;
+    isPrivate: boolean;
     @Field({ nullable: true })
+    scheduledTime: Date;
+}
+
+@InputType()
+export class CreateClassInput implements Partial<Class> {
+    @Field()
+    className: string;
+    @Field()
+    classType: ClassType;
+    @Field()
+    instructorUserId: string;
+    @Field({ nullable: true })
+    description: string;
+    @Field()
+    requiredEquipment: Equipment;
+    @Field()
+    difficulty: Difficulty;
+    @Field({ nullable: true })
+    expectedDuration: string;
+    @Field()
+    isPrivate: boolean;
+    @Field()
     scheduledTime: Date;
 }

@@ -31,3 +31,22 @@ export class UserInput implements Partial<User> {
     @Field(_type => GraphQLJSONObject, { nullable: true })
     following: User[];
 }
+
+@InputType()
+export class CreateUserInput implements Partial<User> {
+    @Field()
+    userId: string;
+    @Field()
+    @IsEmail()
+    email: string;
+    @Field()
+    password: string;
+    @Field()
+    firstName: string;
+    @Field()
+    lastName: string;
+    @Field({ nullable: true })
+    biography: string;
+    @Field()
+    accountType: AccountType;
+}

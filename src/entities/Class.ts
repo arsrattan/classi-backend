@@ -2,7 +2,6 @@ import {Field, ID, ObjectType} from "type-graphql";
 import ClassType from "../enums/ClassType";
 import Equipment from "../enums/Equipment";
 import Difficulty from "../enums/Difficulty";
-import Privacy from "../enums/Privacy";
 import {GraphQLJSONObject} from "graphql-type-json";
 import {User} from "./User";
 import {Comment} from "./Comment";
@@ -16,18 +15,18 @@ export class Class {
     className: string;
     @Field()
     classType: ClassType;
-    @Field(_type => GraphQLJSONObject, { nullable: true })//change later
-    instructor: User;
+    @Field()
+    instructorUserId: string;
     @Field({ nullable: true })
     description: string;
     @Field()
     requiredEquipment: Equipment;
-    @Field()
+    @Field({ nullable: true })
     difficulty: Difficulty;
-    @Field()
+    @Field({ nullable: true })
     expectedDuration: string;
     @Field()
-    privacy: Privacy;
+    isPrivate: boolean;
     @Field()
     scheduledTime: Date;
     @Field(_type => GraphQLJSONObject)

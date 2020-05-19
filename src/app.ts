@@ -1,6 +1,5 @@
 import "reflect-metadata";
 import express, {Application} from "express";
-import * as https from 'https'
 import * as http from 'http'
 import Redis from "ioredis";
 import * as bodyParser from "body-parser";
@@ -8,8 +7,8 @@ import {buildSchema} from "type-graphql";
 import {ApolloServer} from "apollo-server-express";
 import {UserResolver} from "./resolvers/UserResolver";
 import {ClassResolver} from "./resolvers/ClassResolver";
-import PostController from "./controllers/PostController";
 import {RedisPubSub} from "graphql-redis-subscriptions";
+import {PostResolver} from "./resolvers/PostResolver";
 
 class App {
     public config(app: Application): void {
@@ -31,7 +30,7 @@ class App {
             subscriber: new Redis(options)
         });
         const schema = await buildSchema({
-            resolvers: [UserResolver, ClassResolver, PostController],
+            resolvers: [UserResolver, ClassResolver, PostResolver],
             emitSchemaFile: true,
             validate: false,
             pubSub: pubsub

@@ -13,7 +13,7 @@ import {
 } from "type-graphql";
 import {User} from "../entities/User";
 import UserController from "../controllers/UserController";
-import {UserInput} from "./inputs/user-input";
+import {CreateUserInput, UserInput} from "./inputs/user-input";
 import {AuthData} from "../entities/AuthData";
 import {isAuth, isCorrectUser, isCorrectUserFromConfirmation} from "../auth/isAuth";
 import {Topic} from "../subscriptions/topics";
@@ -72,7 +72,7 @@ export class UserResolver {
     };
 
     @Mutation(() => Boolean)
-    async registerUser(@Arg("data") data: UserInput,
+    async registerUser(@Arg("data") data: CreateUserInput,
                        @PubSub(Topic.NewClass) notifyGotClasses: Publisher<NewClassPayload>) {
         const isRegistered: Boolean = await this.userController.registerUser(data);
         if(isRegistered.valueOf() == true){

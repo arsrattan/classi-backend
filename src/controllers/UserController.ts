@@ -49,12 +49,10 @@ class UserController{
         if(!token.startsWith(confirmUserPrefix)){
             throw new Error('Incorrect token type!')
         }
-        const tokenConent = token.substring(token.indexOf(":"))
-        console.log(token);
-        console.log(tokenConent)
+        const tokenContent = token.split(":")[1];
         let decodedToken;
         try {
-            decodedToken = jwt.verify(tokenConent, "wefgeijgne"); // need to move the key
+            decodedToken = jwt.verify(tokenContent, "wefgeijgne"); // need to move the key
         }
         catch (err) {
             throw new Error('Not authorized!');
@@ -83,9 +81,7 @@ class UserController{
         if(!token.startsWith(forgotPasswordPrefix)){
             throw new Error('Incorrect token type!')
         }
-        const tokenConent = token.substring(token.indexOf(":"))
-        console.log(token);
-        console.log(tokenConent)
+        const tokenConent = token.split(":")[1];
         let decodedToken;
         try {
             decodedToken = jwt.verify(tokenConent, "wefgeijgne"); // need to move the key
@@ -148,7 +144,7 @@ class UserController{
                 session.close();
                 this.driver.close();
                 const token = confirmUserPrefix
-                    + ":" + jwt.sign({userId: data['userId']}, "wefgeijgne",{expiresIn: '1h'});
+                    + jwt.sign({userId: data['userId']}, "wefgeijgne",{expiresIn: '1h'});
                 const url = `http://localhost:3000/user/confirm/${token}`
                 sendEmail("mjhadjri@gmail.com", url);
                 return true;
@@ -171,7 +167,7 @@ class UserController{
                 }
                 const user = result.records[0].toObject()["n"]["properties"]
                 const token = forgotPasswordPrefix
-                    + ":" + jwt.sign({userId: user.userId}, "wefgeijgne",{expiresIn: '1h'});
+                    + jwt.sign({userId: user.userId}, "wefgeijgne",{expiresIn: '1h'});
                 const url = `http://localhost:3000/user/change-password/${token}`
                 sendEmail(email, url);
                 this.driver.close();

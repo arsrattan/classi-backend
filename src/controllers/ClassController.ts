@@ -56,18 +56,22 @@ class ClassController{
             TableName: "classesTable",
             Key: {"classId": classId},
             UpdateExpression: updateExpression,
+            ConditionExpression: "instructorUserId = :instructorUserId",
             ExpressionAttributeValues: expressionAttValues
         };
         const promise = docClient.update(params).promise();
         return promise.then(() => true).catch(() => false)
     }
 
-    public async deleteClassById(classId: string): Promise<Boolean> {
-        //todo return something better than a success boolean
+    public async deleteClassById(classId: string, userId: string): Promise<Boolean> {
         const docClient = createDocumentClient("Class");
         const params = {
             TableName: "classesTable",
-            Key: {"classId": classId}
+            Key: {"classId": classId},
+            ConditionExpression: "instructorUserId = :instructorUserId",
+            ExpressionAttributeValues: {
+                ':instructorUserId': userId
+            }
         };
         const promise = docClient.delete(params).promise();
         return promise.then(() => true).catch(() => false)

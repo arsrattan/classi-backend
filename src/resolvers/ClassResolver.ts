@@ -1,7 +1,7 @@
 import {Arg, Mutation, Query, Resolver, UseMiddleware} from "type-graphql";
 import {Class} from "../entities/Class";
 import ClassController from "../controllers/ClassController";
-import {ClassInput} from "./inputs/class-input";
+import {CreateClassInput, UpdateClassInput} from "./inputs/class-input";
 import {isAuth, isCorrectUser, isCorrectUserFromJson} from "../auth/isAuth";
 
 @Resolver()
@@ -21,15 +21,22 @@ export class ClassResolver {
         return await this.classController.getAllClasses();
     };
 
-    @UseMiddleware(isAuth)
+    @UseMiddleware(isCorrectUserFromJson)
     @Mutation(() => Boolean)
-    async createClass(@Arg("data") data: ClassInput) {
+    async createClass(@Arg("data") data: CreateClassInput) {
         return await this.classController.createClass(data);
+    };
+
+    @UseMiddleware(isCorrectUser)
+    @Mutation(() => Boolean)
+    async addCommentToClass(@Arg("data") data: UpdateClassInput,
+                          @Arg("userId") userId: string) {
+        return await this.classController.addCommentToClass(data, userId);
     };
 
     @UseMiddleware(isCorrectUserFromJson)
     @Mutation(() => Boolean)
-    async updateClassById(@Arg("data") data: ClassInput,
+    async updateClassById(@Arg("data") data: UpdateClassInput,
                           @Arg("classId") classId: string) {
         return await this.classController.updateClassById(data, classId);
     };
@@ -38,7 +45,7 @@ export class ClassResolver {
     @Mutation(() => Boolean)
     async deleteClassById(@Arg("classId") classId: string,
                           @Arg("userId") userId: string) {
-        return await this.classController.deleteClassById(classId);
+        return await this.classController.deleteClassById(classId, userId);
     }
 
 }

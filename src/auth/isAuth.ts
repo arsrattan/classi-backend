@@ -48,10 +48,10 @@ export const isCorrectUserFromJson: MiddlewareFn<{req: any}> = ({ args, context:
     catch (err) {
         throw new Error('Not authorized!');
     }
-    let decodedUser = (args['data'].instructor == null)
+    let decodedUser = (args['data'].instructorUserId == null)
         ? args['data'].creator
-        : args['data'].instructor;
-    if(!decodedToken || decodedUser.userId !== decodedToken.userId) throw new Error('Not authorized!');
+        : args['data'].instructorUserId;
+    if(!decodedToken || decodedUser !== decodedToken.userId) throw new Error('Not authorized!');
 
     return next();
 };
@@ -59,9 +59,7 @@ export const isCorrectUserFromJson: MiddlewareFn<{req: any}> = ({ args, context:
 export const isCorrectUserFromConfirmation: MiddlewareFn<{req: any}> = ({ args}, next) => {
     const token = args['token'];
     if(!token || token == '') throw new Error('Not authorized!');
-    const tokenConent = token.substring(token.indexOf(":"))
-    console.log(token);
-    console.log(tokenConent)
+    const tokenConent = token.split(":")[1];
     let decodedToken;
     try {
         decodedToken = jwt.verify(tokenConent, "wefgeijgne"); // need to move the key

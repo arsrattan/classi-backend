@@ -1,6 +1,7 @@
-import createDocumentClient from "../lib/AWS";
 import uniqid from 'uniqid';
 import {Class} from "../entities/Class";
+import {createDocumentClient, Upload, uploadFileToS3} from "../lib/AWS";
+import AWS from "aws-sdk";
 
 class ClassController{
 
@@ -24,7 +25,20 @@ class ClassController{
         return promise.then(res => <Class[]> res.Items)
     };
 
-    public async createClass(data: any): Promise<Boolean> {
+    public async createClass(data: any, picture: Upload): Promise<Boolean> {
+        const {filename} = picture
+        const S3: AWS.S3 = new AWS.S3({
+            accessKeyId: "AKIAQOSR45TLEGYSMGHB",
+            secretAccessKey: "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"
+        })
+        let imageKey: string;
+        try {
+            imageKey = await uploadFileToS3(S3, filename, "classi-class-pictures")
+        }
+        catch (err) {
+            throw new Error('Error uploading profile picture!');
+        }
+        data['imageKey'] = imageKey;
         const docClient = createDocumentClient("Class");
         const classId = uniqid();
         let createdClass: any = {classId: classId};
@@ -40,7 +54,7 @@ class ClassController{
         return promise.then(() => true).catch(() => false)
     }
 
-    public async updateClassById(data: any, classId: string): Promise<Boolean> {
+    public async updateClassById(data: any, classId: string, picture: Upload): Promise<Boolean> {
         const docClient = createDocumentClient("Class");
         let updateExpression = "SET";
         let expressionAttValues: any = {};

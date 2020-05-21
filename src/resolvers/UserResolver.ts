@@ -6,7 +6,6 @@ import {
     PubSub,
     Query,
     Resolver,
-    ResolverFilterData,
     Root,
     Subscription,
     UseMiddleware
@@ -16,18 +15,9 @@ import UserController from "../controllers/UserController";
 import {CreateUserInput, UserInput} from "./inputs/user-input";
 import {AuthData} from "../entities/AuthData";
 import {isAuth, isCorrectUser, isCorrectUserFromConfirmation} from "../auth/isAuth";
-import {Topic} from "../subscriptions/topics";
-import {GraphQLJSONObject} from "graphql-type-json";
-
-export interface NewClassPayload {
-    message: string;
-}
-
-@ArgsType()
-export class NewClassArgs {
-    @Field(type => ID)
-    recipeId: string;
-}
+import {GraphQLUpload} from "graphql-upload";
+import AWS from "aws-sdk";
+import {Upload, uploadFileToS3} from "../lib/AWS";
 
 @Resolver()
 export class UserResolver {
@@ -73,12 +63,8 @@ export class UserResolver {
 
     @Mutation(() => Boolean)
     async registerUser(@Arg("data") data: CreateUserInput,
-                       @PubSub(Topic.NewClass) notifyGotClasses: Publisher<NewClassPayload>) {
-        const isRegistered: Boolean = await this.userController.registerUser(data);
-        if(isRegistered.valueOf() == true){
-            await notifyGotClasses({ message: "yah" })
-        }
-        return isRegistered;
+                       @Arg("picture", () => GraphQLUpload) picture: Upload) {
+        return await this.userController.registerUser(data, picture);
     };
 
     @UseMiddleware(isCorrectUserFromConfirmation)
@@ -102,8 +88,9 @@ export class UserResolver {
     @UseMiddleware(isCorrectUser)
     @Mutation(() => Boolean)
     async updateUser(@Arg("data") data: UserInput,
-                     @Arg("userId") userId: string) {
-        return await this.userController.updateUser(data, userId);
+                     @Arg("userId") userId: string,
+                     @Arg("picture", () => GraphQLUpload) picture: Upload) {
+        return await this.userController.updateUser(data, userId, picture);
     };
 
     @UseMiddleware(isCorrectUser)
@@ -112,16 +99,16 @@ export class UserResolver {
         return await this.userController.deleteUserById(userId);
     }
 
-    @Subscription(() => GraphQLJSONObject, {
-        topics: Topic.NewClass,
-        // filter: ({ payload, args }: ResolverFilterData<NewClassPayload, NewClassArgs>) => {
-        //     return payload.message === args.recipeId;
-        // },
-    })
-    newComments(@Root() newComment: NewClassPayload): any {
-        return {
-            message: 'testing123123',
-        };
-    }
+    // @Subscription(() => GraphQLJSONObject, {
+    //     topics: Topic.NewClass,
+    //     // filter: ({ payload, args }: ResolverFilterData<NewClassPayload, NewClassArgs>) => {
+    //     //     return payload.message === args.recipeId;
+    //     // },
+    // })
+    // newComments(@Root() newComment: NewClassPayload): any {
+    //     return {
+    //         message: 'testing123123',
+    //     };
+    // }
 
 }

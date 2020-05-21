@@ -6,6 +6,8 @@ import {AuthData} from "../entities/AuthData";
 import {Driver} from "neo4j-driver/types/v1/driver";
 import {sendEmail} from "../util/sendEmail";
 import {confirmUserPrefix, forgotPasswordPrefix} from "../util/tokenConstants";
+import {Upload, uploadFileToS3} from "../lib/AWS";
+import AWS from "aws-sdk";
 
 class UserController{
     //import this from elsewhere
@@ -123,7 +125,20 @@ class UserController{
         });
     }
 
-    public async registerUser(data: any): Promise<Boolean> {
+    public async registerUser(data: any, picture: Upload): Promise<Boolean> {
+        const {filename} = picture
+        const S3: AWS.S3 = new AWS.S3({
+            accessKeyId: "AKIAQOSR45TLEGYSMGHB",
+            secretAccessKey: "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"
+        })
+        let imageKey: string;
+        try {
+            imageKey = await uploadFileToS3(S3, filename, "classi-profile-pictures")
+        }
+        catch (err) {
+            throw new Error('Error uploading profile picture!');
+        }
+        data['imageKey'] = imageKey;
         const hash = await(this.hashPassword(data['password']));
         let cypher = "CREATE (n:User { "
         let keys = Object.keys(data)
@@ -282,7 +297,7 @@ class UserController{
         }
     }
 
-    public async updateUser(data: any, userId: string): Promise<Boolean> {
+    public async updateUser(data: any, userId: string, picture: Upload): Promise<Boolean> {
         //todo
         return null;
     }

@@ -9,12 +9,14 @@ import {UserResolver} from "./resolvers/UserResolver";
 import {ClassResolver} from "./resolvers/ClassResolver";
 import {RedisPubSub} from "graphql-redis-subscriptions";
 import {PostResolver} from "./resolvers/PostResolver";
+import {graphqlUploadExpress} from "graphql-upload";
 
 class App {
     public config(app: Application): void {
         app.set("port", process.env.PORT || 3000);
         app.use(express.json());
         app.use(bodyParser.json());
+        app.use(graphqlUploadExpress({ maxFileSize: 100000000, maxFiles: 10 }));
     }
 
     public async start(): Promise<void> {
@@ -37,7 +39,7 @@ class App {
             //authMode: "null",
         });
 
-        const graphQlServer = new ApolloServer({schema, context: ({ req }) => {
+        const graphQlServer = new ApolloServer({schema, uploads: false, context: ({ req }) => {
                 return {req};
             }
         });

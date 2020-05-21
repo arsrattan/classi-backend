@@ -10,6 +10,8 @@ export class User {
     userId!: string;
     @Field()
     email: string;
+    @Field({nullable: true})
+    imageKey: string;
     @Field()
     firstName: string;
     @Field()

@@ -3,7 +3,6 @@ import ClassType from "../enums/ClassType";
 import Equipment from "../enums/Equipment";
 import Difficulty from "../enums/Difficulty";
 import {GraphQLJSONObject} from "graphql-type-json";
-import {User} from "./User";
 import {Comment} from "./Comment";
 
 @ObjectType({ description: "The Class model" })
@@ -13,6 +12,8 @@ export class Class {
     classId!: string;
     @Field()
     className: string;
+    @Field({nullable: true})
+    imageKey: string;
     @Field()
     classType: ClassType;
     @Field()

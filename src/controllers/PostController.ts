@@ -1,6 +1,6 @@
-import createDocumentClient from "../lib/AWS";
 import uniqid from 'uniqid';
 import {Post} from "../entities/Post";
+import {createDocumentClient} from "../lib/AWS";
 
 class PostController{
 

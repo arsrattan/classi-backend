@@ -23,7 +23,7 @@ export class User {
     @Field()
     accountType: AccountType;
     @Field()
-    creationDate: Date;
+    createdAt: number;
     @Field(_type => GraphQLJSONObject)
     classHistory: Class[];
     @Field(_type => GraphQLJSONObject)

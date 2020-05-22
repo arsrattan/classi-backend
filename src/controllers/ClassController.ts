@@ -39,6 +39,7 @@ class ClassController{
             throw new Error('Error uploading profile picture!');
         }
         data['imageKey'] = imageKey;
+        data['createdAt'] = Date.now();
         const docClient = createDocumentClient("Class");
         const classId = uniqid();
         let createdClass: any = {classId: classId};

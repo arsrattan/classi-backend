@@ -18,7 +18,7 @@ export class Post {
     @Field()
     postType: PostType;
     @Field()
-    creationDate: Date;
+    createdAt: number;
     @Field(_type => [String])
     likes: string[]; //list of userids
 }

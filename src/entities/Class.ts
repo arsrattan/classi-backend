@@ -29,7 +29,9 @@ export class Class {
     @Field()
     isPrivate: boolean;
     @Field()
-    scheduledTime: Date;
+    scheduledTime: number;
+    @Field()
+    createdAt: number;
     @Field(_type => GraphQLJSONObject)
     comments: Comment[];
 }

@@ -32,6 +32,7 @@ class PostController{
         for(let i = 0; i < keys.length; i++){
             createdPost[keys[i]] = data[keys[i]];
         }
+        createdPost['createdAt'] = Date.now();
         const params = {
             TableName: "postsTable",
             Item: createdPost

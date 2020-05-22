@@ -10,7 +10,7 @@ export class Comment {
     @Field()
     message: string;
     @Field()
-    creationDate: Date;
+    createdAt: number;
     @Field({nullable: true})
     parentComment: Comment;
     @Field(_type => [String])

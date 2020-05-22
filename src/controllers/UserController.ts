@@ -139,6 +139,7 @@ class UserController{
             throw new Error('Error uploading profile picture!');
         }
         data['imageKey'] = imageKey;
+        data['createdAt'] = Date.now();
         const hash = await(this.hashPassword(data['password']));
         let cypher = "CREATE (n:User { "
         let keys = Object.keys(data)

@@ -30,7 +30,7 @@ export class UpdateClassInput implements Partial<Class> {
     @Field({ nullable: true })
     isPrivate: boolean;
     @Field({ nullable: true })
-    scheduledTime: Date;
+    scheduledTime: number;
 }
 
 @InputType()
@@ -52,5 +52,5 @@ export class CreateClassInput implements Partial<Class> {
     @Field()
     isPrivate: boolean;
     @Field()
-    scheduledTime: Date;
+    scheduledTime: number;
 }

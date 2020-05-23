@@ -125,20 +125,15 @@ class UserController{
         });
     }
 
-    public async registerUser(data: any, picture: Upload): Promise<Boolean> {
-        const {filename} = picture
-        const S3: AWS.S3 = new AWS.S3({
-            accessKeyId: "AKIAQOSR45TLEGYSMGHB",
-            secretAccessKey: "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"
-        })
-        let imageKey: string;
-        try {
-            imageKey = await uploadFileToS3(S3, filename, "classi-profile-pictures")
+    public async registerUser(data: any, picture?: Upload): Promise<Boolean> {
+        await this.getUserById(data['userId']).then(users => {
+            if(users.length != 0){
+                throw new Error('User already exists!');
+            }
+        });
+        if(picture){
+            data = await uploadFileToS3(data, picture, "classi-profile-pictures");
         }
-        catch (err) {
-            throw new Error('Error uploading profile picture!');
-        }
-        data['imageKey'] = imageKey;
         data['createdAt'] = Date.now();
         const hash = await(this.hashPassword(data['password']));
         let cypher = "CREATE (n:User { "
@@ -298,7 +293,10 @@ class UserController{
         }
     }
 
-    public async updateUser(data: any, userId: string, picture: Upload): Promise<Boolean> {
+    public async updateUser(userId: string, data?: any, picture?: Upload): Promise<Boolean> {
+        if(picture){
+            data = await uploadFileToS3(data, picture, "classi-profile-pictures");
+        }
         //todo
         return null;
     }

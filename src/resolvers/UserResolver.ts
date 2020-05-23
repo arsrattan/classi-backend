@@ -16,7 +16,6 @@ import {CreateUserInput, UserInput} from "./inputs/user-input";
 import {AuthData} from "../entities/AuthData";
 import {isAuth, isCorrectUser, isCorrectUserFromConfirmation} from "../auth/isAuth";
 import {GraphQLUpload} from "graphql-upload";
-import AWS from "aws-sdk";
 import {Upload, uploadFileToS3} from "../lib/AWS";
 
 @Resolver()
@@ -62,8 +61,8 @@ export class UserResolver {
     };
 
     @Mutation(() => Boolean)
-    async registerUser(@Arg("data") data: CreateUserInput,
-                       @Arg("picture", () => GraphQLUpload) picture: Upload) {
+    async registerUser(@Arg("data", {nullable: true}) data: CreateUserInput,
+                       @Arg("picture", () => GraphQLUpload, {nullable: true}) picture: Upload) {
         return await this.userController.registerUser(data, picture);
     };
 
@@ -87,10 +86,10 @@ export class UserResolver {
 
     @UseMiddleware(isCorrectUser)
     @Mutation(() => Boolean)
-    async updateUser(@Arg("data") data: UserInput,
+    async updateUser(@Arg("data", {nullable: true}) data: UserInput,
                      @Arg("userId") userId: string,
-                     @Arg("picture", () => GraphQLUpload) picture: Upload) {
-        return await this.userController.updateUser(data, userId, picture);
+                     @Arg("picture", () => GraphQLUpload, {nullable: true}) picture: Upload) {
+        return await this.userController.updateUser(userId, data, picture);
     };
 
     @UseMiddleware(isCorrectUser)

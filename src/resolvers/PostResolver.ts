@@ -3,6 +3,9 @@ import {PostInput} from "./inputs/post-input";
 import PostController from "../controllers/PostController";
 import {Post} from "../entities/Post";
 import {isAuth, isCorrectUser, isCorrectUserFromJson} from "../auth/isAuth";
+import {GraphQLUpload} from "graphql-upload";
+import {Upload} from "../lib/AWS";
+import {CreateCommentInput} from "./inputs/comment-input";
 
 
 @Resolver()
@@ -24,15 +27,25 @@ export class PostResolver {
 
     @UseMiddleware(isAuth)
     @Mutation(() => Boolean)
-    async createPost(@Arg("data") data: PostInput) {
+    async createPost(@Arg("data") data: PostInput,
+                     @Arg("picture", () => GraphQLUpload, {nullable: true}) picture: Upload) {
         return await this.postController.createPost(data);
     };
 
     @UseMiddleware(isCorrectUserFromJson)
     @Mutation(() => Boolean)
-    async updatePostById(@Arg("data") data: PostInput,
-                          @Arg("postId") postId: string) {
-        return await this.postController.updatePostById(data, postId);
+    async updatePostById(@Arg("data", {nullable: true}) data: PostInput,
+                         @Arg("postId") postId: string,
+                         @Arg("picture", () => GraphQLUpload, {nullable: true}) picture: Upload) {
+        return await this.postController.updatePostById(postId, data);
+    };
+
+    @UseMiddleware(isCorrectUser)
+    @Mutation(() => Boolean)
+    async addCommentToPost(@Arg("data") data: CreateCommentInput,
+                            @Arg("postId") postId: string,
+                            @Arg("userId") userId: string) {
+        return await this.postController.addCommentToPost(userId, postId, data);
     };
 
     @UseMiddleware(isCorrectUser)

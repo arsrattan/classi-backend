@@ -1,13 +1,14 @@
 import {Field, InputType} from "type-graphql";
 import {Comment} from "../../entities/Comment";
 import {User} from "../../entities/User";
+import {GraphQLJSONObject} from "graphql-type-json";
 
 @InputType()
 export class CreateCommentInput implements Partial<Comment> {
     @Field()
-    createdBy: User;
+    createdBy: string;
     @Field()
     message: string;
-    @Field({nullable: true})
+    @Field(_type => GraphQLJSONObject,{nullable: true})
     parentComment: Comment;
 }

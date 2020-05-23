@@ -1,6 +1,6 @@
 import uniqid from 'uniqid';
 import {Post} from "../entities/Post";
-import {createDocumentClient} from "../lib/AWS";
+import {createDocumentClient, Upload, uploadFileToS3} from "../lib/AWS";
 
 class PostController{
 
@@ -24,24 +24,26 @@ class PostController{
         return promise.then(res => <Post[]> res.Items)
     };
 
-    public async createPost(data: any): Promise<Boolean> {
-        const docClient = createDocumentClient("Post");
-        const postId = uniqid();
-        let createdPost: any = {postId: postId};
-        let keys = Object.keys(data)
-        for(let i = 0; i < keys.length; i++){
-            createdPost[keys[i]] = data[keys[i]];
+    public async createPost(data: any, picture?: Upload): Promise<Boolean> {
+        if(picture){
+            data = await uploadFileToS3(data, picture, "classi-profile-pictures");
         }
-        createdPost['createdAt'] = Date.now();
+        data['postId'] = uniqid();
+        data['comments'] = [];
+        data['createdAt'] = Date.now();
+        const docClient = createDocumentClient("Post");
         const params = {
             TableName: "postsTable",
-            Item: createdPost
+            Item: data
         };
         const promise = docClient.put(params).promise();
         return promise.then(() => true).catch(() => false)
     }
 
-    public async updatePostById(data: any, postId: string): Promise<Boolean> {
+    public async updatePostById(postId: string, data?: any, picture?: Upload): Promise<Boolean> {
+        if(picture){
+            data = await uploadFileToS3(data, picture, "classi-profile-pictures");
+        }
         const docClient = createDocumentClient("Post");
         let updateExpression = "SET";
         let expressionAttValues: any = {};
@@ -71,6 +73,27 @@ class PostController{
             Key: { "postId": postId }
         };
         const promise = docClient.delete(params).promise();
+        return promise.then(() => true).catch(() => false)
+    }
+
+    public async addCommentToPost(userId: string, postId: string, data: any): Promise<Boolean> {
+        data['createdAt'] = Date.now();
+        data['likes'] = [];
+        data['commentId'] = uniqid();
+        const docClient = createDocumentClient("Post");
+        const params = {
+            TableName: "postsTable",
+            Key: {"postId": postId},
+            UpdateExpression: 'SET #comments = list_append(if_not_exists(#comments, :empty_list), :comment)',
+            ExpressionAttributeNames: {
+                '#comments': 'comments'
+            },
+            ExpressionAttributeValues: {
+                ':comment': [data],
+                ':empty_list': []
+            }
+        };
+        const promise = docClient.update(params).promise();
         return promise.then(() => true).catch(() => false)
     }
 }

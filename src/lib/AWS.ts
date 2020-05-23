@@ -1,6 +1,5 @@
 import AWS from "aws-sdk";
 import {Stream} from "stream";
-import {WritableResponse} from "nodemailer/lib/fetch";
 
 const isDev = process.env.NODE_ENV !== 'production';
 
@@ -11,7 +10,7 @@ export interface Upload {
   createReadStream: () => Stream;
 }
 
-export async function uploadFileToS3(s3, filename, tableName): Promise<string> {
+export async function performUpload(s3: AWS.S3, filename: string, tableName: string): Promise<string> {
   const pass = new Stream.PassThrough()
   const params = {
     Bucket: tableName,
@@ -23,6 +22,23 @@ export async function uploadFileToS3(s3, filename, tableName): Promise<string> {
     console.log(data);
   })
   return filename;
+}
+
+export async function uploadFileToS3(data: any, picture: Upload, tableName: string): Promise<any> {
+  const {filename} = picture
+  const S3: AWS.S3 = new AWS.S3({
+    accessKeyId: "AKIAQOSR45TLEGYSMGHB",
+    secretAccessKey: "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"
+  })
+  let imageKey: string;
+  try {
+    imageKey = await performUpload(S3, filename, tableName)
+  }
+  catch (err) {
+    throw new Error('Error uploading profile picture!');
+  }
+  data['imageKey'] = imageKey;
+  return data;
 }
 
 export function createDocumentClient(model: "Class" | "User" | "Post"): AWS.DynamoDB.DocumentClient {

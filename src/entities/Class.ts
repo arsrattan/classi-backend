@@ -32,6 +32,6 @@ export class Class {
     scheduledTime: number;
     @Field()
     createdAt: number;
-    @Field(_type => GraphQLJSONObject)
+    @Field(_type => GraphQLJSONObject, { nullable: true })
     comments: Comment[];
 }

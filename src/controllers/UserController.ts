@@ -7,13 +7,11 @@ import {Driver} from "neo4j-driver/types/v1/driver";
 import {sendEmail} from "../util/sendEmail";
 import {confirmUserPrefix, forgotPasswordPrefix} from "../util/tokenConstants";
 import {Upload, uploadFileToS3} from "../lib/AWS";
-import AWS from "aws-sdk";
 import {getDecodedToken} from "../auth/isAuth";
+import {JWT_SECRET} from "../util/secrets";
 
 class UserController{
-    //import this from elsewhere
-    private privateKey: string = "wefgeijgne";
-
+    
     public driver: Driver = neo4j.v1.driver(
         "bolt://localhost",
         neo4j.v1.auth.basic("neo4j", "letmein"),
@@ -35,7 +33,7 @@ class UserController{
                     throw new Error('Please confirm your email.');
                 }
                 else {
-                    const token = jwt.sign({userId: user.userId, email: user.email}, this.privateKey,{expiresIn: '1h'});
+                    const token = jwt.sign({userId: user.userId, email: user.email}, JWT_SECRET,{expiresIn: '1h'});
                     this.driver.close();
                     return { accessToken: token, userId: user.userId, expirationInHours: 1 }
                 }
@@ -136,7 +134,7 @@ class UserController{
                 session.close();
                 this.driver.close();
                 const token = confirmUserPrefix
-                    + jwt.sign({userId: data['userId']}, "wefgeijgne",{expiresIn: '1h'});
+                    + jwt.sign({userId: data['userId']}, JWT_SECRET,{expiresIn: '1h'});
                 const url = `http://localhost:3000/user/confirm/${token}`
                 sendEmail("mjhadjri@gmail.com", url);
                 return true;
@@ -159,7 +157,7 @@ class UserController{
                 }
                 const user = result.records[0].toObject()["n"]["properties"]
                 const token = forgotPasswordPrefix
-                    + jwt.sign({userId: user.userId}, "wefgeijgne",{expiresIn: '1h'});
+                    + jwt.sign({userId: user.userId}, JWT_SECRET,{expiresIn: '1h'});
                 const url = `http://localhost:3000/user/change-password/${token}`
                 sendEmail(email, url);
                 this.driver.close();

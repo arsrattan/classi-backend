@@ -1,9 +1,7 @@
 import * as jwt from "jsonwebtoken";
 import {MiddlewareFn} from "type-graphql";
-import AWS from "aws-sdk";
-import {performUpload, Upload} from "../lib/AWS";
-import {confirmUserPrefix} from "../util/tokenConstants";
 import {AuthData} from "../entities/AuthData";
+import {JWT_SECRET} from "../util/secrets";
 
 export const isAuth: MiddlewareFn<{req: any}> = ({ context: {req} }, next) => {
     //We send in a header formatted as 'Bearer eofnow23rgn4pitgnwef2onfblahblah' from the frontend
@@ -13,7 +11,7 @@ export const isAuth: MiddlewareFn<{req: any}> = ({ context: {req} }, next) => {
     if(!token || token == '') throw new Error('Not authorized!');
     let decodedToken;
     try {
-        decodedToken = jwt.verify(token, "wefgeijgne"); // need to move the key
+        decodedToken = jwt.verify(token, JWT_SECRET);
     }
     catch (err) {
         throw new Error('Not authorized!');
@@ -30,7 +28,7 @@ export const isCorrectUser: MiddlewareFn<{req: any}> = ({ args, context: {req} }
     if(!token || token == '') throw new Error('Not authorized!');
     let decodedToken;
     try {
-        decodedToken = jwt.verify(token, "wefgeijgne"); // need to move the key
+        decodedToken = jwt.verify(token, JWT_SECRET);
     }
     catch (err) {
         throw new Error('Not authorized!');
@@ -47,7 +45,7 @@ export const isCorrectUserFromJson: MiddlewareFn<{req: any}> = ({ args, context:
     if(!token || token == '') throw new Error('Not authorized!');
     let decodedToken;
     try {
-        decodedToken = jwt.verify(token, "wefgeijgne"); // need to move the key
+        decodedToken = jwt.verify(token, JWT_SECRET);
     }
     catch (err) {
         throw new Error('Not authorized!');
@@ -66,7 +64,7 @@ export const isCorrectUserFromConfirmation: MiddlewareFn<{req: any}> = ({ args},
     const tokenConent = token.split(":")[1];
     let decodedToken;
     try {
-        decodedToken = jwt.verify(tokenConent, "wefgeijgne"); // need to move the key
+        decodedToken = jwt.verify(tokenConent, JWT_SECRET);
     }
     catch (err) {
         throw new Error('Not authorized!');
@@ -82,7 +80,7 @@ export function getDecodedToken(prefix: string, token: string): AuthData {
     const tokenContent = token.split(":")[1];
     let decodedToken;
     try {
-        decodedToken = jwt.verify(tokenContent, "wefgeijgne"); // need to move the key
+        decodedToken = jwt.verify(tokenContent, JWT_SECRET);
     }
     catch (err) {
         throw new Error('Not authorized!');

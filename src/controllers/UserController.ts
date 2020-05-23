@@ -8,6 +8,7 @@ import {sendEmail} from "../util/sendEmail";
 import {confirmUserPrefix, forgotPasswordPrefix} from "../util/tokenConstants";
 import {Upload, uploadFileToS3} from "../lib/AWS";
 import AWS from "aws-sdk";
+import {getDecodedToken} from "../auth/isAuth";
 
 class UserController{
     //import this from elsewhere
@@ -48,17 +49,7 @@ class UserController{
     }
 
     public async confirmUser(token: string): Promise<Boolean> {
-        if(!token.startsWith(confirmUserPrefix)){
-            throw new Error('Incorrect token type!')
-        }
-        const tokenContent = token.split(":")[1];
-        let decodedToken;
-        try {
-            decodedToken = jwt.verify(tokenContent, "wefgeijgne"); // need to move the key
-        }
-        catch (err) {
-            throw new Error('Not authorized!');
-        }
+        const decodedToken: AuthData = getDecodedToken(confirmUserPrefix, token);
         if(!decodedToken || decodedToken.userId == null) throw new Error('Not authorized!');
         let cypher: string =
             'MATCH (n:User) WHERE n.userId = "' + decodedToken.userId + '" ' +
@@ -80,17 +71,7 @@ class UserController{
     }
 
     public async changePassword(token: string, password: string): Promise<Boolean> {
-        if(!token.startsWith(forgotPasswordPrefix)){
-            throw new Error('Incorrect token type!')
-        }
-        const tokenConent = token.split(":")[1];
-        let decodedToken;
-        try {
-            decodedToken = jwt.verify(tokenConent, "wefgeijgne"); // need to move the key
-        }
-        catch (err) {
-            throw new Error('Not authorized!');
-        }
+        const decodedToken: AuthData = getDecodedToken(forgotPasswordPrefix, token);
         if(!decodedToken || decodedToken.userId == null) throw new Error('Not authorized!');
         const hashedPassword = await(this.hashPassword(password));
         if(hashedPassword !== null){
@@ -267,7 +248,7 @@ class UserController{
                 session.close();
                 console.log(error);
                 this.driver.close()
-                return -1;
+                return 0;
             });
     }
 

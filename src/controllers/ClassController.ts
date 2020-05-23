@@ -16,9 +16,7 @@ class ClassController{
         const params = {
             TableName: "classesTable",
             KeyConditionExpression: 'classId = :i',
-            ExpressionAttributeValues: {
-                ':i': classId
-            }
+            ExpressionAttributeValues: {':i': classId}
         };
         const promise = docClient.query(params).promise();
         return promise.then(res => <Class[]> res.Items)

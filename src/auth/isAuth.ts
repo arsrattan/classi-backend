@@ -1,5 +1,9 @@
 import * as jwt from "jsonwebtoken";
 import {MiddlewareFn} from "type-graphql";
+import AWS from "aws-sdk";
+import {performUpload, Upload} from "../lib/AWS";
+import {confirmUserPrefix} from "../util/tokenConstants";
+import {AuthData} from "../entities/AuthData";
 
 export const isAuth: MiddlewareFn<{req: any}> = ({ context: {req} }, next) => {
     //We send in a header formatted as 'Bearer eofnow23rgn4pitgnwef2onfblahblah' from the frontend
@@ -70,3 +74,18 @@ export const isCorrectUserFromConfirmation: MiddlewareFn<{req: any}> = ({ args},
     if(!decodedToken || decodedToken.userId == null) throw new Error('Not authorized!');
     return next();
 };
+
+export function getDecodedToken(prefix: string, token: string): AuthData {
+    if(!token.startsWith(prefix)){
+        throw new Error('Incorrect token type!')
+    }
+    const tokenContent = token.split(":")[1];
+    let decodedToken;
+    try {
+        decodedToken = jwt.verify(tokenContent, "wefgeijgne"); // need to move the key
+    }
+    catch (err) {
+        throw new Error('Not authorized!');
+    }
+    return decodedToken;
+}

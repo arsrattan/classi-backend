@@ -1,7 +1,7 @@
 import {Field, ID, ObjectType} from "type-graphql";
 import {GraphQLJSONObject} from "graphql-type-json";
 
-@ObjectType({ description: "The Comment model" })
+@ObjectType("Comment")
 export class Comment {
     @Field(() => ID)
     commentId!: string;

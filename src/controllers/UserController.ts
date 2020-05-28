@@ -12,7 +12,10 @@ import {JWT_SECRET} from "../util/secrets";
 
 class UserController{
     
-    public driver: Driver = neo4j.v1.driver(
+    public
+
+
+    driver: Driver = neo4j.v1.driver(
         "bolt://localhost",
         neo4j.v1.auth.basic("neo4j", "letmein"),
         {encrypted: 'ENCRYPTION_OFF'})

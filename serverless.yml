@@ -1,0 +1,33 @@
+service:
+  name: classi-backend
+
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+
+plugins:
+  - serverless-webpack
+  - serverless-dynamodb-local
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage, 'dev'}
+  apiGateway:
+    minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+
+functions:
+  graphql:
+    handler: src/graphql.graphqlHandler
+    events:
+      - http:
+          path: graphql
+          method: POST
+          cors: true
+      - http:
+          path: graphql
+          method: GET

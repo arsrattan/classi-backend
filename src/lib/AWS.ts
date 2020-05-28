@@ -2,6 +2,8 @@ import AWS from "aws-sdk";
 import {Stream} from "stream";
 
 const isDev = process.env.NODE_ENV !== 'production';
+const key = process.env.AWS_ACCESS_KEY_ID;
+const secret = process.env.AWS_SECRET_ACCESS_KEY;
 
 export interface Upload {
   filename: string;

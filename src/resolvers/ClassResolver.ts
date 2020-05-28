@@ -5,7 +5,6 @@ import {CreateClassInput, UpdateClassInput} from "./inputs/class-input";
 import {isAuth, isCorrectUser, isCorrectUserFromJson} from "../auth/isAuth";
 import {GraphQLUpload} from "graphql-upload";
 import {Upload} from "../lib/AWS";
-import {Comment} from "../entities/Comment";
 import {CreateCommentInput} from "./inputs/comment-input";
 
 @Resolver()

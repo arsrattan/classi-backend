@@ -5,7 +5,7 @@ import Difficulty from "../enums/Difficulty";
 import {GraphQLJSONObject} from "graphql-type-json";
 import {Comment} from "./Comment";
 
-@ObjectType({ description: "The Class model" })
+@ObjectType("Class")
 export class Class {
 
     @Field(() => ID)
@@ -14,15 +14,15 @@ export class Class {
     className: string;
     @Field({nullable: true})
     imageKey: string;
-    @Field()
+    @Field(type => ClassType)
     classType: ClassType;
     @Field()
     instructorUserId: string;
     @Field({ nullable: true })
     description: string;
-    @Field()
+    @Field(type => Equipment)
     requiredEquipment: Equipment;
-    @Field({ nullable: true })
+    @Field(type => Difficulty, { nullable: true })
     difficulty: Difficulty;
     @Field({ nullable: true })
     expectedDuration: string;

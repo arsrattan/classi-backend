@@ -16,7 +16,7 @@ import {CreateUserInput, UserInput} from "./inputs/user-input";
 import {AuthData} from "../entities/AuthData";
 import {isAuth, isCorrectUser, isCorrectUserFromConfirmation} from "../auth/isAuth";
 import {GraphQLUpload} from "graphql-upload";
-import {Upload, uploadFileToS3} from "../lib/AWS";
+import {Upload} from "../lib/AWS";
 
 @Resolver()
 export class UserResolver {

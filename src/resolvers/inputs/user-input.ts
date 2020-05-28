@@ -20,7 +20,7 @@ export class UserInput implements Partial<User> {
     password: string;
     @Field({ nullable: true })
     biography: string;
-    @Field({ nullable: true })
+    @Field(type => AccountType, { nullable: true })
     accountType: AccountType;
     @Field(_type => GraphQLJSONObject, { nullable: true })
     classHistory: Class[];
@@ -47,6 +47,6 @@ export class CreateUserInput implements Partial<User> {
     lastName: string;
     @Field({ nullable: true })
     biography: string;
-    @Field()
+    @Field(type => AccountType)
     accountType: AccountType;
 }

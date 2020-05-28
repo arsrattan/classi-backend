@@ -1,3 +1,5 @@
+import {registerEnumType} from "type-graphql";
+
 enum AccountType {
     Trial = "TRIAL",
     Free = "FREE",
@@ -6,3 +8,5 @@ enum AccountType {
 }
 
 export default AccountType;
+
+registerEnumType(AccountType, {name: "AccountType"});

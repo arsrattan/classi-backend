@@ -16,9 +16,7 @@ class PostController{
         const params = {
             TableName: "postsTable",
             KeyConditionExpression: 'postId = :i',
-            ExpressionAttributeValues: {
-                ':i': postId
-            }
+            ExpressionAttributeValues: {':i': postId}
         };
         const promise = docClient.query(params).promise();
         return promise.then(res => <Post[]> res.Items)

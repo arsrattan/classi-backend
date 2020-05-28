@@ -4,18 +4,18 @@ import {User} from "./User";
 import PostType from "../enums/PostType";
 import {Comment} from "./Comment";
 
-@ObjectType({ description: "The Post model" })
+@ObjectType("Post")
 export class Post {
 
     @Field(() => ID)
     postId!: string;
     @Field()
-    creator: User;
+    createdBy: string;
     @Field({nullable: true})
     caption: string;
     @Field(_type => GraphQLJSONObject)
     comments: Comment[];
-    @Field()
+    @Field(type => PostType)
     postType: PostType;
     @Field()
     createdAt: number;

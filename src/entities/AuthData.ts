@@ -1,6 +1,6 @@
 import {Field, ObjectType} from "type-graphql";
 
-@ObjectType()
+@ObjectType("AuthData")
 export class AuthData {
     @Field()
     accessToken: string;

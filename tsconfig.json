@@ -3,7 +3,6 @@
         "noImplicitAny": false,
         "removeComments": true,
         "preserveConstEnums": true,
-        "outDir": "built/",
         "sourceMap": true,
         "esModuleInterop": true,
         "target": "es2018",
@@ -17,7 +16,11 @@
         "src/**/*"
     ],
     "exclude": [
-        "node_modules",
-        "**/*.spec.ts"
+        "node_modules/**/*",
+        ".serverless/**/*",
+        ".webpack/**/*",
+        "_warmup/**/*",
+        "**/*.spec.ts",
+        ".vscode/**/*"
     ]
 }

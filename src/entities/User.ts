@@ -3,7 +3,7 @@ import { GraphQLJSONObject } from 'graphql-type-json'
 import AccountType from "../enums/AccountType";
 import {Class} from "./Class";
 
-@ObjectType({ description: "The User model" })
+@ObjectType("User")
 export class User {
 
     @Field(() => ID)
@@ -20,7 +20,7 @@ export class User {
     password: string;
     @Field({nullable: true})
     biography: string;
-    @Field()
+    @Field(type => AccountType)
     accountType: AccountType;
     @Field()
     createdAt: number;

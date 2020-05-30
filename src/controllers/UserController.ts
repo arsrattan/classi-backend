@@ -11,13 +11,13 @@ import {getDecodedToken} from "../auth/isAuth";
 import {JWT_SECRET} from "../util/secrets";
 
 class UserController{
-    
-    public
+    private user: string = process.env.NEO4J_USER;
+    private password: string = process.env.NEO4J_PASSWORD;
+    private host: string = process.env.NEO4J_IP;
 
-
-    driver: Driver = neo4j.v1.driver(
-        "bolt://localhost",
-        neo4j.v1.auth.basic("neo4j", "letmein"),
+    public driver: Driver = neo4j.v1.driver(
+        "bolt://" + this.host,
+        neo4j.v1.auth.basic(this.user, this.password),
         {encrypted: 'ENCRYPTION_OFF'})
 
     public async login(email: string, password: string): Promise<AuthData> {
@@ -32,9 +32,9 @@ class UserController{
                     this.driver.close();
                     throw new Error('Incorrect password!');
                 }
-                else if(!user.confirmed){
-                    throw new Error('Please confirm your email.');
-                }
+                // else if(!user.confirmed){
+                //     throw new Error('Please confirm your email.');
+                // }
                 else {
                     const token = jwt.sign({userId: user.userId, email: user.email}, JWT_SECRET,{expiresIn: '1h'});
                     this.driver.close();
@@ -109,7 +109,7 @@ class UserController{
 
     public async registerUser(data: any, picture?: Upload): Promise<Boolean> {
         await this.getUserById(data['userId']).then(users => {
-            if(users.length != 0){
+            if(users.length == 1){
                 throw new Error('User already exists!');
             }
         });
@@ -139,7 +139,7 @@ class UserController{
                 const token = confirmUserPrefix
                     + jwt.sign({userId: data['userId']}, JWT_SECRET,{expiresIn: '1h'});
                 const url = `http://localhost:3000/user/confirm/${token}`
-                sendEmail("mjhadjri@gmail.com", url);
+                sendEmail(data['email'], url);
                 return true;
             })
             .catch(error => {

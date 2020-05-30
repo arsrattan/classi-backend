@@ -1,30 +1,39 @@
 import nodemailer from "nodemailer";
+import sesTransport from "nodemailer-ses-transport"
 
 export async function sendEmail(email: string, url: string) {
 
-    const testAccount = await nodemailer.createTestAccount();
+    const key = process.env.AWS_ACCESS_KEY_ID;
+    const secret = process.env.AWS_SECRET_ACCESS_KEY;
+
+    const awsCreds = {
+        accessKeyId : key,
+        secretAccessKey : secret
+    };
 
     // create reusable transporter object using the default SMTP transport
-    const transporter = nodemailer.createTransport({
-        host: "smtp.ethereal.email",
-        port: 587,
-        secure: false, // true for 465, false for other ports
-        auth: {
-            user: testAccount.user,
-            pass: testAccount.pass,
-        },
-    });
+    const transporter = nodemailer.createTransport(sesTransport({
+        accessKeyId: awsCreds.accessKeyId,
+        secretAccessKey: awsCreds.secretAccessKey,
+        rateLimit: 5,
+        serverUrl : 'email-smtp.us-west-2.amazonaws.com'
+    }));
+
+    const mailOptions = {
+        from: 'FromName <no-reply@domain.com>',
+        to: email, // list of receivers
+        subject: 'Please Confirm Email', // Subject line
+        html: `<a href="${url}">${url}</a>` // html body
+    };
 
     // send mail with defined transport object
-    const info = await transporter.sendMail({
-        from: '"Fred Foo 👻" <foo@example.com>', // sender address
-        to: email,
-        subject: "Hello ✔",
-        text: "Hello world?",
-        html: `<a href="${url}">${url}</a>`,
-    });
 
-    console.log("Message sent: %s", info.messageId);
-    // Preview only available when sending through an Ethereal account
-    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+
+    transporter.sendMail(mailOptions, function(error, info){
+        if( error ) {
+            console.log(error);
+        } else {
+            console.log('Message sent: ' + info);
+        }
+    });
 }

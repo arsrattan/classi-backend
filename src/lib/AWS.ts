@@ -1,7 +1,7 @@
 import AWS from "aws-sdk";
 import {Stream} from "stream";
 
-const isDev = process.env.NODE_ENV !== 'production';
+const isLocal = process.env.NODE_ENV !== 'local';
 const key = process.env.AWS_ACCESS_KEY_ID;
 const secret = process.env.AWS_SECRET_ACCESS_KEY;
 
@@ -29,8 +29,8 @@ export async function performUpload(s3: AWS.S3, filename: string, tableName: str
 export async function uploadFileToS3(data: any, picture: Upload, tableName: string): Promise<any> {
   const {filename} = picture
   const S3: AWS.S3 = new AWS.S3({
-    accessKeyId: "AKIAQOSR45TLEGYSMGHB",
-    secretAccessKey: "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"
+    accessKeyId: key,
+    secretAccessKey: secret
   })
   let imageKey: string;
   try {
@@ -44,10 +44,9 @@ export async function uploadFileToS3(data: any, picture: Upload, tableName: stri
 }
 
 export function createDocumentClient(model: "Class" | "User" | "Post"): AWS.DynamoDB.DocumentClient {
-  if (isDev) {
+  if (isLocal) {
     return new AWS.DynamoDB.DocumentClient({
-      region: "local",
-      endpoint: "http://localhost:8000"
+      region: "us-east-1",
     });
   }
   else {

@@ -13,6 +13,6 @@ export class Comment {
     createdAt: number;
     @Field(_type => GraphQLJSONObject,{nullable: true})
     parentComment: Comment;
-    @Field(_type => [String])
+    @Field(_type => GraphQLJSONObject, {nullable: true})
     likes: string[];
 }

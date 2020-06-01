@@ -58,6 +58,15 @@ export class PostResolver {
         return await this.postController.likePost(userId, postCreator, postId, isUnlike);
     };
 
+    // @UseMiddleware(isCorrectUser)
+    // @Mutation(() => Boolean)
+    // async likeComment(@Arg("commentId") commentId: string,
+    //                @Arg("userId") userId: string,
+    //                @Arg("commentCreator") commentCreator: string,
+    //                @Arg("isUnlike") isUnlike: boolean) {
+    //     return await this.postController.likeComment(userId, commentCreator, commentId, isUnlike);
+    // };
+
     @UseMiddleware(isCorrectUser)
     @Mutation(() => Boolean)
     async deletePost(@Arg("postId") postId: string,

@@ -40,6 +40,15 @@ export class ClassResolver {
         return await this.classController.addCommentToClass(userId, classCreator, classId, data);
     };
 
+    // @UseMiddleware(isCorrectUser)
+    // @Mutation(() => Boolean)
+    // async likeComment(@Arg("commentId") commentId: string,
+    //                   @Arg("userId") userId: string,
+    //                   @Arg("commentCreator") commentCreator: string,
+    //                   @Arg("isUnlike") isUnlike: boolean) {
+    //     return await this.classController.likeComment(userId, commentCreator, commentId, isUnlike);
+    // };
+
     @UseMiddleware(isCorrectUserFromJson)
     @Mutation(() => Boolean)
     async updateClassById(@Arg("data", {nullable: true}) data: UpdateClassInput,

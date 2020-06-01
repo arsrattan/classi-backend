@@ -84,7 +84,6 @@ class PostController{
 
     public async addCommentToPost(userId: string, postCreator: string, postId: string, data: any): Promise<Boolean> {
         data['createdAt'] = Date.now();
-        data['likes'] = [];
         data['commentId'] = "comment" + uniqid();
         const params = {
             TableName: "postsTable",

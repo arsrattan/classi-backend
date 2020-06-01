@@ -1,13 +1,8 @@
 import {
     Arg,
-    Args, ArgsType, Field, ID,
     Mutation,
-    Publisher,
-    PubSub,
     Query,
     Resolver,
-    Root,
-    Subscription,
     UseMiddleware
 } from "type-graphql";
 import {User} from "../entities/User";
@@ -17,6 +12,7 @@ import {AuthData} from "../entities/AuthData";
 import {isAuth, isCorrectUser, isCorrectUserFromConfirmation} from "../auth/isAuth";
 import {GraphQLUpload} from "graphql-upload";
 import {Upload} from "../lib/AWS";
+import {Notification} from "../entities/Notification";
 
 @Resolver()
 export class UserResolver {
@@ -47,6 +43,12 @@ export class UserResolver {
         return await this.userController.getUserFollowers(userId);
     };
 
+    @UseMiddleware(isCorrectUser)
+    @Query(() => [Notification], { nullable: true })
+    async getUserNotifications(@Arg("userId") userId: string){
+        return await this.userController.getUserNotifications(userId);
+    };
+
     @UseMiddleware(isAuth)
     @Query(() => Number, { nullable: true })
     async getNumFollowers(@Arg("userId") userId: string){
@@ -56,8 +58,9 @@ export class UserResolver {
     @UseMiddleware(isCorrectUser)
     @Mutation(() => Boolean)
     async toggleFollow(@Arg("userId") userId: string,
-                       @Arg("followedUser") followedUser: string){
-        return await this.userController.toggleFollow(userId, followedUser);
+                       @Arg("followedUser") followedUser: string,
+                       @Arg("isUnfollow") isUnfollow: boolean){
+        return await this.userController.toggleFollow(userId, followedUser, isUnfollow);
     };
 
     @Mutation(() => Boolean)
@@ -97,17 +100,5 @@ export class UserResolver {
     async deleteUserById(@Arg("userId") userId: string) {
         return await this.userController.deleteUserById(userId);
     }
-
-    // @Subscription(() => GraphQLJSONObject, {
-    //     topics: Topic.NewClass,
-    //     // filter: ({ payload, args }: ResolverFilterData<NewClassPayload, NewClassArgs>) => {
-    //     //     return payload.message === args.recipeId;
-    //     // },
-    // })
-    // newComments(@Root() newComment: NewClassPayload): any {
-    //     return {
-    //         message: 'testing123123',
-    //     };
-    // }
 
 }

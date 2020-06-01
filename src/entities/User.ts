@@ -2,6 +2,7 @@ import {Field, ID, ObjectType} from "type-graphql";
 import { GraphQLJSONObject } from 'graphql-type-json'
 import AccountType from "../enums/AccountType";
 import {Class} from "./Class";
+import {Notification} from "./Notification";
 
 @ObjectType("User")
 export class User {
@@ -32,6 +33,8 @@ export class User {
     followers: User[];
     @Field(_type => GraphQLJSONObject)
     following: User[];
+    @Field(_type => GraphQLJSONObject)
+    notifications: Notification[];
     @Field()
     confirmed: boolean;
 }

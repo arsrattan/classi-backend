@@ -43,9 +43,19 @@ export class PostResolver {
     @UseMiddleware(isCorrectUser)
     @Mutation(() => Boolean)
     async addCommentToPost(@Arg("data") data: CreateCommentInput,
-                            @Arg("postId") postId: string,
-                            @Arg("userId") userId: string) {
-        return await this.postController.addCommentToPost(userId, postId, data);
+                           @Arg("postId") postId: string,
+                           @Arg("postCreator") postCreator: string,
+                           @Arg("userId") userId: string) {
+        return await this.postController.addCommentToPost(userId, postCreator, postId, data);
+    };
+
+    @UseMiddleware(isCorrectUser)
+    @Mutation(() => Boolean)
+    async likePost(@Arg("postId") postId: string,
+                   @Arg("userId") userId: string,
+                   @Arg("postCreator") postCreator: string,
+                   @Arg("isUnlike") isUnlike: boolean) {
+        return await this.postController.likePost(userId, postCreator, postId, isUnlike);
     };
 
     @UseMiddleware(isCorrectUser)

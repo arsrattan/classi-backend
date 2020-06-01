@@ -34,4 +34,6 @@ export class Class {
     createdAt: number;
     @Field(_type => GraphQLJSONObject, { nullable: true })
     comments: Comment[];
+    @Field( _type => GraphQLJSONObject, {nullable: true})
+    likes: string[]; //set of userids
 }

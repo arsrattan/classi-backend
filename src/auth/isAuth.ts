@@ -3,9 +3,8 @@ import {MiddlewareFn} from "type-graphql";
 import {AuthData} from "../entities/AuthData";
 import {JWT_SECRET} from "../util/secrets";
 
-export const isAuth: MiddlewareFn<{req: any}> = ({ context: {req} }, next) => {
-    //We send in a header formatted as 'Bearer eofnow23rgn4pitgnwef2onfblahblah' from the frontend
-    const authHeader = req.get('Authorization');
+export const isAuth: MiddlewareFn<{req: any}> = (req, next) => {
+    const authHeader = req.context['headers']['Authorization'];
     if (!authHeader) throw new Error('Not authorized!');
     const token = authHeader.split(' ')[1];
     if(!token || token == '') throw new Error('Not authorized!');
@@ -21,8 +20,8 @@ export const isAuth: MiddlewareFn<{req: any}> = ({ context: {req} }, next) => {
     return next();
 };
 
-export const isCorrectUser: MiddlewareFn<{req: any}> = ({ args, context: {req} }, next) => {
-    const authHeader = req.get('Authorization');
+export const isCorrectUser: MiddlewareFn<{req: any}> = ({ args, context }, next) => {
+    const authHeader = context['headers']['Authorization'];
     if (!authHeader) throw new Error('Not authorized!');
     const token = authHeader.split(' ')[1];
     if(!token || token == '') throw new Error('Not authorized!');
@@ -38,8 +37,8 @@ export const isCorrectUser: MiddlewareFn<{req: any}> = ({ args, context: {req} }
     return next();
 };
 
-export const isCorrectUserFromJson: MiddlewareFn<{req: any}> = ({ args, context: {req} }, next) => {
-    const authHeader = req.get('Authorization');
+export const isCorrectUserFromJson: MiddlewareFn<{req: any}> = ({ args, context }, next) => {
+    const authHeader = context['headers']['Authorization'];
     if (!authHeader) throw new Error('Not authorized!');
     const token = authHeader.split(' ')[1];
     if(!token || token == '') throw new Error('Not authorized!');

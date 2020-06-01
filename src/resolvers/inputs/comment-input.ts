@@ -1,6 +1,5 @@
 import {Field, InputType} from "type-graphql";
 import {Comment} from "../../entities/Comment";
-import {User} from "../../entities/User";
 import {GraphQLJSONObject} from "graphql-type-json";
 
 @InputType()

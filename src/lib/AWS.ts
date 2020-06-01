@@ -1,7 +1,7 @@
 import AWS from "aws-sdk";
 import {Stream} from "stream";
 
-const isLocal = process.env.NODE_ENV !== 'local';
+const isLocal = process.env.NODE_ENV == 'local';
 const key = process.env.AWS_ACCESS_KEY_ID;
 const secret = process.env.AWS_SECRET_ACCESS_KEY;
 
@@ -43,8 +43,8 @@ export async function uploadFileToS3(data: any, picture: Upload, tableName: stri
   return data;
 }
 
-export function createDocumentClient(model: "Class" | "User" | "Post"): AWS.DynamoDB.DocumentClient {
-  if (isLocal) {
+export function createDocumentClient(model: "Class" | "Post"): AWS.DynamoDB.DocumentClient {
+  if (!isLocal) {
     return new AWS.DynamoDB.DocumentClient({
       region: "us-east-1",
     });

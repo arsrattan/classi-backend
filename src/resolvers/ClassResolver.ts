@@ -34,9 +34,10 @@ export class ClassResolver {
     @UseMiddleware(isCorrectUser)
     @Mutation(() => Boolean)
     async addCommentToClass(@Arg("data") data: CreateCommentInput,
+                            @Arg("classCreator") classCreator: string,
                             @Arg("classId") classId: string,
                           @Arg("userId") userId: string) {
-        return await this.classController.addCommentToClass(userId, classId, data);
+        return await this.classController.addCommentToClass(userId, classCreator, classId, data);
     };
 
     @UseMiddleware(isCorrectUserFromJson)
@@ -45,6 +46,15 @@ export class ClassResolver {
                           @Arg("classId") classId: string,
                           @Arg("picture", () => GraphQLUpload, {nullable: true}) picture: Upload) {
         return await this.classController.updateClassById(classId, data, picture);
+    };
+
+    @UseMiddleware(isCorrectUser)
+    @Mutation(() => Boolean)
+    async likeClass(@Arg("userId") userId: string,
+                    @Arg("classCreator") classCreator: string,
+                    @Arg("classId") classId: string,
+                    @Arg("isUnlike") isUnlike: boolean) {
+        return await this.classController.likeClass(userId, classCreator, classId, isUnlike);
     };
 
     @UseMiddleware(isCorrectUser)

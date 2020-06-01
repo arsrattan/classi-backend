@@ -1,53 +1,59 @@
 import uniqid from 'uniqid';
 import {Class} from "../entities/Class";
 import {createDocumentClient, Upload, uploadFileToS3} from "../lib/AWS";
+import NotificationType from "../enums/NotificationType";
+import UserController from "./UserController";
 
 class ClassController{
+    private docClient = createDocumentClient("Class");
+    private userController: UserController = new UserController();
 
     public async getAllClasses(): Promise<Class[]> {
-        const docClient = createDocumentClient("Class");
         const params = { TableName: "classesTable" }; //I created this table locally
-        const promise = docClient.scan(params).promise();
-        return promise.then(res => <Class[]> res.Items)
+        const promise = this.docClient.scan(params).promise();
+        return promise.then(res => <Class[]> res.Items).catch(err => {
+            throw new Error(err);
+        });
     };
 
     public async getClassById(classId: string): Promise<Class[]> {
-        const docClient = createDocumentClient("Class");
         const params = {
             TableName: "classesTable",
             KeyConditionExpression: 'classId = :i',
             ExpressionAttributeValues: {':i': classId}
         };
-        const promise = docClient.query(params).promise();
-        return promise.then(res => <Class[]> res.Items)
+        const promise = this.docClient.query(params).promise();
+        return promise.then(res => <Class[]> res.Items).catch(err => {
+            throw new Error(err);
+        });
     };
 
     public async createClass(data: any, picture?: Upload): Promise<Boolean> {
         if(picture){
-            data = await uploadFileToS3(data, picture, "classi-profile-pictures");
+            data = await uploadFileToS3(data, picture, "classi-class-pictures");
         }
         data['createdAt'] = Date.now();
         data['comments'] = [];
-        data['classId'] = uniqid();
-        const docClient = createDocumentClient("Class");
+        data['classId'] = "class" + uniqid();
         const params = {
             TableName: "classesTable",
             Item: data
         };
-        const promise = docClient.put(params).promise();
-        return promise.then(() => true).catch(() => false)
+        const promise = this.docClient.put(params).promise();
+        return promise.then(() => true).catch(err => {
+            throw new Error(err);
+        });
     }
 
     public async updateClassById(classId: string, data?: any, picture?: Upload): Promise<Boolean> {
         if(picture){
             data = await uploadFileToS3(data, picture, "classi-profile-pictures");
         }
-        const docClient = createDocumentClient("Class");
         let updateExpression = "SET";
         let expressionAttValues: any = {};
         //construct an update expression for only the values present in the req
         //also only want to add present fields to the expression attribute values
-        let keys = Object.keys(data)
+        const keys = Object.keys(data)
         for(let i = 0; i < keys.length; i++){
             expressionAttValues[":" + keys[i]] = data[keys[i]];
             updateExpression += " " + keys[i] + " = :" + keys[i];
@@ -60,12 +66,13 @@ class ClassController{
             ConditionExpression: "instructorUserId = :instructorUserId",
             ExpressionAttributeValues: expressionAttValues
         };
-        const promise = docClient.update(params).promise();
-        return promise.then(() => true).catch(() => false)
+        const promise = this.docClient.update(params).promise();
+        return promise.then(() => true).catch(err => {
+            throw new Error(err);
+        });
     }
 
     public async deleteClassById(classId: string, userId: string): Promise<Boolean> {
-        const docClient = createDocumentClient("Class");
         const params = {
             TableName: "classesTable",
             Key: {"classId": classId},
@@ -74,15 +81,15 @@ class ClassController{
                 ':instructorUserId': userId
             }
         };
-        const promise = docClient.delete(params).promise();
-        return promise.then(() => true).catch(() => false)
+        const promise = this.docClient.delete(params).promise();
+        return promise.then(() => true).catch(err => {
+            throw new Error(err);
+        });
     }
 
-    public async addCommentToClass(userId: string, classId: string, data: any): Promise<Boolean> {
+    public async addCommentToClass(userId: string, classCreator: string, classId: string, data: any): Promise<Boolean> {
         data['createdAt'] = Date.now();
-        data['likes'] = [];
-        data['commentId'] = uniqid();
-        const docClient = createDocumentClient("Class");
+        data['commentId'] = "comment" + uniqid();
         const params = {
             TableName: "classesTable",
             Key: {"classId": classId},
@@ -95,8 +102,61 @@ class ClassController{
                 ':empty_list': []
             }
         };
-        const promise = docClient.update(params).promise();
-        return promise.then(() => true).catch(() => false)
+        const promise = this.docClient.update(params).promise();
+        return promise.then(() => {
+            try {
+                this.userController.createUserNotification({
+                    userId: classCreator,
+                    triggeringUserId: userId,
+                    notificationType: NotificationType.New_Class_Comment
+                });
+            }
+            catch(err){
+                throw new Error(err);
+            }
+            return true
+        }).catch(err => {
+            throw new Error(err);
+        });
+    }
+
+    public async likeClass(userId: string, classCreator: string, classId: string, isUnlike: boolean): Promise<Boolean> {
+        let params;
+        if(!isUnlike){
+            params = {
+                TableName: "classesTable",
+                Key: {"classId": classId},
+                UpdateExpression : 'ADD #likes :likes',
+                ExpressionAttributeNames : {'#likes' : 'likes'},
+                ExpressionAttributeValues : {':likes' : this.docClient.createSet([userId])},
+                ReturnValues: 'UPDATED_NEW'
+            };
+        }
+        else {
+            params = {
+                TableName: "classesTable",
+                Key: {"classId": classId},
+                UpdateExpression : 'DELETE likes :likes',
+                ExpressionAttributeValues : {':likes' : this.docClient.createSet([userId])},
+                ReturnValues: 'ALL_NEW'
+            };
+        }
+        const promise = this.docClient.update(params).promise();
+        return promise.then(() => {
+            try {
+                this.userController.createUserNotification({
+                    userId: classCreator,
+                    triggeringUserId: userId,
+                    notificationType: NotificationType.New_Class_Like
+                });
+            }
+            catch(err){
+                throw new Error(err);
+            }
+            return true;
+        }).catch(err => {
+            throw new Error(err);
+        });
     }
 }
 

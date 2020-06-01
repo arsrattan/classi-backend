@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt-nodejs";
+import uniqid from 'uniqid';
 import * as jwt from "jsonwebtoken";
 import {User} from "../entities/User";
 import * as neo4j from 'neo4j-driver'
@@ -9,6 +10,8 @@ import {confirmUserPrefix, forgotPasswordPrefix} from "../util/tokenConstants";
 import {Upload, uploadFileToS3} from "../lib/AWS";
 import {getDecodedToken} from "../auth/isAuth";
 import {JWT_SECRET} from "../util/secrets";
+import NotificationType from "../enums/NotificationType";
+import {Notification} from "../entities/Notification";
 
 class UserController{
     private user: string = process.env.NEO4J_USER;
@@ -19,6 +22,17 @@ class UserController{
         "bolt://" + this.host,
         neo4j.v1.auth.basic(this.user, this.password),
         {encrypted: 'ENCRYPTION_OFF'})
+
+    public async hashPassword(password: string) {
+        return new Promise((resolve, reject) => {
+            bcrypt.genSalt(12, (error, salt) => {
+                if (error) return reject(error);
+                bcrypt.hash(password, salt, null,
+                    (error, hash) => error ? reject(error) : resolve(hash)
+                );
+            });
+        });
+    }
 
     public async login(email: string, password: string): Promise<AuthData> {
         const session = this.driver.session()
@@ -65,9 +79,58 @@ class UserController{
             })
             .catch(error => {
                 session.close();
-                console.log(error);
                 this.driver.close()
-                return error;
+                throw new Error(error);
+            });
+    }
+
+    public async createUserNotification(data: any): Promise<Boolean> {
+        data['createdAt'] = Date.now();
+        data['notificationId'] = "notification" + uniqid();
+        let cypher: string =
+            'match(u:User) where u.userId="' + data['userId'] + '"' +
+            ' create (u)-[r:HAS_NOTIFICATION]->(n:Notification{';
+        const keys = Object.keys(data)
+        for(let i = 0; i < keys.length; i++){
+            cypher += keys[i] + ": \'" + data[keys[i]] + "\'";
+            if(!(i == keys.length - 1)) cypher += ",";
+        }
+        cypher += "})";
+        const session = this.driver.session()
+        return session.run(cypher)
+            .then(() => {
+                session.close();
+                this.driver.close();
+                return true;
+            })
+            .catch(error => {
+                session.close();
+                this.driver.close()
+                throw new Error(error);
+            });
+    }
+
+    public async getUserNotifications(userId: string): Promise<Notification[]> {
+        let notifications: any = [];
+        let cypher: string =
+            'Match(u:User)-[:HAS_NOTIFICATION]->(n:Notification) where u.userId = "' + userId +
+            '" with n order by n.createdAt limit 10 return n';
+        const session = this.driver.session()
+        return session.run(cypher)
+            .then(result => {
+                session.close();
+                console.log(result);
+                console.log(result.records);
+                result.records.forEach(record => {
+                    notifications.push(record.toObject()["n"]["properties"]);
+                })
+                this.driver.close();
+                return notifications;
+            })
+            .catch(error => {
+                session.close();
+                this.driver.close()
+                throw new Error(error);
             });
     }
 
@@ -89,22 +152,10 @@ class UserController{
                 })
                 .catch(error => {
                     session.close();
-                    console.log(error);
                     this.driver.close()
-                    return error;
+                    throw new Error(error);
                 });
         }
-    }
-
-    public async hashPassword(password: string) {
-        return new Promise((resolve, reject) => {
-            bcrypt.genSalt(12, (error, salt) => {
-                if (error) return reject(error);
-                bcrypt.hash(password, salt, null,
-                    (error, hash) => error ? reject(error) : resolve(hash)
-                );
-            });
-        });
     }
 
     public async registerUser(data: any, picture?: Upload): Promise<Boolean> {
@@ -114,13 +165,21 @@ class UserController{
             }
         });
         if(picture){
-            data = await uploadFileToS3(data, picture, "classi-profile-pictures");
+            try{
+                data = await uploadFileToS3(data, picture, "classi-profile-pictures");
+            }
+            catch(err){
+                throw new Error(err);
+            }
         }
         data['createdAt'] = Date.now();
+        data['following'] = [];
+        data['followers'] = [];
+        data['classHistory'] = [];
+        data['registeredClasses'] = [];
         const hash = await(this.hashPassword(data['password']));
         let cypher = "CREATE (n:User { "
-        let keys = Object.keys(data)
-        //there is probably a better way to do this
+        const keys = Object.keys(data)
         for(let i = 0; i < keys.length; i++){
             if(keys[i] == 'password'){
                 cypher += keys[i] + ": \'" + hash + "\'";
@@ -144,9 +203,8 @@ class UserController{
             })
             .catch(error => {
                 session.close();
-                console.log(error);
                 this.driver.close()
-                return false;
+                throw new Error(error);
             });
     }
 
@@ -168,9 +226,8 @@ class UserController{
             })
             .catch(error => {
                 session.close();
-                console.log(error);
                 this.driver.close()
-                return error;
+                throw new Error(error);
             });
     }
 
@@ -188,9 +245,8 @@ class UserController{
             })
             .catch(error => {
                 session.close();
-                console.log(error);
                 this.driver.close()
-                return error;
+                throw new Error(error);
             });
     }
 
@@ -208,9 +264,8 @@ class UserController{
             })
             .catch(error => {
                 session.close();
-                console.log(error);
                 this.driver.close()
-                return error;
+                throw new Error(error);
             });
     }
 
@@ -231,9 +286,8 @@ class UserController{
             })
             .catch(error => {
                 session.close();
-                console.log(error);
                 this.driver.close()
-                return error;
+                throw new Error(error);
             });
     }
 
@@ -247,15 +301,14 @@ class UserController{
             })
             .catch(error => {
                 session.close();
-                console.log(error);
                 this.driver.close()
-                return 0;
+                throw new Error(error);
             });
     }
 
-    public async toggleFollow(userId: string, followedUser: string): Promise<Boolean> {
+    public async toggleFollow(userId: string, followedUser: string, isUnfollow: boolean): Promise<Boolean> {
         if(userId !== followedUser){
-            let cypher: string =
+            const cypher: string =
                 'MATCH (u:User), (p:User) WHERE u.userId = ' +
                 '"' + userId + '" AND p.userId = "' + followedUser + '"' +
                 ' CREATE (u)-[:FOLLOWS]->(p) WITH u, p MATCH (u)-[r:FOLLOWS]->(p), (u)-[:FOLLOWS]->(p) DELETE r'
@@ -264,13 +317,24 @@ class UserController{
                 .then(() => {
                     session.close();
                     this.driver.close();
+                    if(!isUnfollow){
+                        try {
+                            this.createUserNotification({
+                                userId: followedUser,
+                                triggeringUserId: userId,
+                                notificationType: NotificationType.New_Follower
+                            });
+                        }
+                        catch(err){
+                            throw new Error(err);
+                        }
+                    }
                     return true;
                 })
                 .catch(error => {
                     session.close();
-                    console.log(error);
                     this.driver.close()
-                    return false;
+                    throw new Error(error);
                 });
         }
     }
@@ -293,9 +357,8 @@ class UserController{
             })
             .catch(error => {
                 session.close();
-                console.log(error);
                 this.driver.close()
-                return false;
+                throw new Error(error);
             });
     }
 }

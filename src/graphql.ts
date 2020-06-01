@@ -15,14 +15,14 @@ const schema = buildSchemaSync({
 
 const graphQlServer = new ApolloServer({
     schema,
-    playground: true,
-    introspection: true,
     context: ({ event, context }) => ({
         headers: event.headers,
         functionName: context.functionName,
         event,
         context,
     }),
+    playground: true,
+    introspection: true,
 });
 
 export function graphqlHandler(event, context, cb) {
@@ -30,6 +30,7 @@ export function graphqlHandler(event, context, cb) {
     return graphQlServer.createHandler({
         cors: {
             origin: '*',
+            credentials: true,
         },
     })(event, context, cb);
 };

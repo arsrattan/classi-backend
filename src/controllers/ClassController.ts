@@ -121,6 +121,7 @@ class ClassController{
     }
 
     public async likeClass(userId: string, classCreator: string, classId: string, isUnlike: boolean): Promise<Boolean> {
+        //todo validate real class
         let params;
         if(!isUnlike){
             params = {
@@ -148,6 +149,46 @@ class ClassController{
                     userId: classCreator,
                     triggeringUserId: userId,
                     notificationType: NotificationType.New_Class_Like
+                });
+            }
+            catch(err){
+                throw new Error(err);
+            }
+            return true;
+        }).catch(err => {
+            throw new Error(err);
+        });
+    }
+
+    public async joinClass(userId: string, classCreator: string, classId: string, isUnlike: boolean): Promise<Boolean> {
+        //todo validate real class
+        let params;
+        if(!isUnlike){
+            params = {
+                TableName: "classesTable",
+                Key: {"classId": classId},
+                UpdateExpression : 'ADD #registeredUsers :registeredUsers',
+                ExpressionAttributeNames : {'#registeredUsers' : 'registeredUsers'},
+                ExpressionAttributeValues : {':registeredUsers' : this.docClient.createSet([userId])},
+                ReturnValues: 'UPDATED_NEW'
+            };
+        }
+        else {
+            params = {
+                TableName: "classesTable",
+                Key: {"classId": classId},
+                UpdateExpression : 'DELETE registeredUsers :registeredUsers',
+                ExpressionAttributeValues : {':registeredUsers' : this.docClient.createSet([userId])},
+                ReturnValues: 'ALL_NEW'
+            };
+        }
+        const promise = this.docClient.update(params).promise();
+        return promise.then(() => {
+            try {
+                this.userController.createUserNotification({
+                    userId: classCreator,
+                    triggeringUserId: userId,
+                    notificationType: NotificationType.New_Class_Registration
                 });
             }
             catch(err){

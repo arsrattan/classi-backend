@@ -8,6 +8,6 @@ export class CreateCommentInput implements Partial<Comment> {
     createdBy: string;
     @Field()
     message: string;
-    @Field(_type => GraphQLJSONObject,{nullable: true})
-    parentComment: Comment;
+    @Field({nullable: true})
+    parentCommentId: string;
 }

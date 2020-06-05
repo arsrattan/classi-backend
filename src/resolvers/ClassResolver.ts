@@ -68,6 +68,15 @@ export class ClassResolver {
 
     @UseMiddleware(isCorrectUser)
     @Mutation(() => Boolean)
+    async joinClass(@Arg("userId") userId: string,
+                    @Arg("classCreator") classCreator: string,
+                    @Arg("classId") classId: string,
+                    @Arg("isUnjoin") isUnjoin: boolean) {
+        return await this.classController.joinClass(userId, classCreator, classId, isUnjoin);
+    };
+
+    @UseMiddleware(isCorrectUser)
+    @Mutation(() => Boolean)
     async deleteClassById(@Arg("classId") classId: string,
                           @Arg("userId") userId: string) {
         return await this.classController.deleteClassById(classId, userId);

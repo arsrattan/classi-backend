@@ -119,8 +119,6 @@ class UserController{
         return session.run(cypher)
             .then(result => {
                 session.close();
-                console.log(result);
-                console.log(result.records);
                 result.records.forEach(record => {
                     notifications.push(record.toObject()["n"]["properties"]);
                 })
@@ -141,7 +139,7 @@ class UserController{
         if(hashedPassword !== null){
             let cypher: string =
                 'MATCH (n:User) WHERE n.userId = "' + decodedToken.userId + '" ' +
-                'SET n.password = ' + hashedPassword + ' ' +
+                'SET n.password = "' + hashedPassword + '" ' +
                 'RETURN n';
             const session = this.driver.session()
             return session.run(cypher)
@@ -198,6 +196,7 @@ class UserController{
                 const token = confirmUserPrefix
                     + jwt.sign({userId: data['userId']}, JWT_SECRET,{expiresIn: '1h'});
                 const url = `http://localhost:3000/user/confirm/${token}`
+                console.log("PTOKEN: " + token);
                 sendEmail(data['email'], url);
                 return true;
             })
@@ -220,6 +219,7 @@ class UserController{
                 const token = forgotPasswordPrefix
                     + jwt.sign({userId: user.userId}, JWT_SECRET,{expiresIn: '1h'});
                 const url = `http://localhost:3000/user/change-password/${token}`
+                console.log("TOKEN: " + token);
                 sendEmail(email, url);
                 this.driver.close();
                 return true;

@@ -35,5 +35,7 @@ export class Class {
     @Field(_type => GraphQLJSONObject, { nullable: true })
     comments: Comment[];
     @Field( _type => GraphQLJSONObject, {nullable: true})
-    likes: string[]; //set of userids
+    likes: any; //set of userids
+    @Field( _type => GraphQLJSONObject, {nullable: true})
+    registeredUsers: any; //set of userids
 }

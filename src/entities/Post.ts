@@ -20,5 +20,5 @@ export class Post {
     @Field()
     createdAt: number;
     @Field( _type => GraphQLJSONObject, {nullable: true})
-    likes: string[]; //set of userids
+    likes: any; //set of userids
 }

@@ -3,6 +3,7 @@ import {Class} from "../../entities/Class";
 import ClassType from "../../enums/ClassType";
 import Equipment from "../../enums/Equipment";
 import Difficulty from "../../enums/Difficulty";
+import Duration from "../../enums/Duration";
 
 @InputType()
 export class UpdateClassInput implements Partial<Class> {
@@ -19,8 +20,8 @@ export class UpdateClassInput implements Partial<Class> {
     requiredEquipment: Equipment;
     @Field(type => Difficulty, { nullable: true })
     difficulty: Difficulty;
-    @Field({ nullable: true })
-    expectedDuration: string;
+    @Field(type => Duration, { nullable: true })
+    expectedDuration: Duration;
     @Field({ nullable: true })
     isPrivate: boolean;
     @Field({ nullable: true })
@@ -41,10 +42,10 @@ export class CreateClassInput implements Partial<Class> {
     requiredEquipment: Equipment;
     @Field(type => Difficulty)
     difficulty: Difficulty;
-    @Field({ nullable: true })
-    expectedDuration: string;
+    @Field(type => Duration)
+    expectedDuration: Duration;
     @Field()
     isPrivate: boolean;
-    @Field()
+    @Field({ nullable: true })
     scheduledTime: number;
 }

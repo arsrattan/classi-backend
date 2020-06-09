@@ -22,6 +22,7 @@ class UserController{
         "bolt://" + this.host,
         neo4j.v1.auth.basic(this.user, this.password),
         {encrypted: 'ENCRYPTION_OFF'})
+    public session = this.driver.session();
 
     public async hashPassword(password: string) {
         return new Promise((resolve, reject) => {
@@ -35,15 +36,12 @@ class UserController{
     }
 
     public async login(email: string, password: string): Promise<AuthData> {
-        const session = this.driver.session()
-        return session.run('MATCH (n { email: \'' + email + '\' }) RETURN n')
+        return this.session.run('MATCH (n { email: \'' + email + '\' }) RETURN n')
             .then(result => {
-                session.close();
                 if(result.records.length == 0) throw new Error('User does not exist!');
                 let user = result.records[0]["_fields"][0]['properties'];
                 const isEqual = bcrypt.compareSync(password, user.password);
                 if(!isEqual) {
-                    this.driver.close();
                     throw new Error('Incorrect password!');
                 }
                 // else if(!user.confirmed){
@@ -51,14 +49,11 @@ class UserController{
                 // }
                 else {
                     const token = jwt.sign({userId: user.userId, email: user.email}, JWT_SECRET,{expiresIn: '1h'});
-                    this.driver.close();
                     return { accessToken: token, userId: user.userId, expirationInHours: 1 }
                 }
             })
             .catch(error => {
-                session.close();
                 console.log(error);
-                this.driver.close()
                 return error;
             });
     }
@@ -70,16 +65,11 @@ class UserController{
             'MATCH (n:User) WHERE n.userId = "' + decodedToken.userId + '" ' +
             'SET n.confirmed = true ' +
             'RETURN n';
-        const session = this.driver.session()
-        return session.run(cypher)
+        return this.session.run(cypher)
             .then(() => {
-                session.close();
-                this.driver.close();
                 return true;
             })
             .catch(error => {
-                session.close();
-                this.driver.close()
                 throw new Error(error);
             });
     }
@@ -96,16 +86,11 @@ class UserController{
             if(!(i == keys.length - 1)) cypher += ",";
         }
         cypher += "})";
-        const session = this.driver.session()
-        return session.run(cypher)
+        return this.session.run(cypher)
             .then(() => {
-                session.close();
-                this.driver.close();
                 return true;
             })
             .catch(error => {
-                session.close();
-                this.driver.close()
                 throw new Error(error);
             });
     }
@@ -115,19 +100,14 @@ class UserController{
         let cypher: string =
             'Match(u:User)-[:HAS_NOTIFICATION]->(n:Notification) where u.userId = "' + userId +
             '" with n order by n.createdAt limit 10 return n';
-        const session = this.driver.session()
-        return session.run(cypher)
+        return this.session.run(cypher)
             .then(result => {
-                session.close();
                 result.records.forEach(record => {
                     notifications.push(record.toObject()["n"]["properties"]);
                 })
-                this.driver.close();
                 return notifications;
             })
             .catch(error => {
-                session.close();
-                this.driver.close()
                 throw new Error(error);
             });
     }
@@ -141,16 +121,11 @@ class UserController{
                 'MATCH (n:User) WHERE n.userId = "' + decodedToken.userId + '" ' +
                 'SET n.password = "' + hashedPassword + '" ' +
                 'RETURN n';
-            const session = this.driver.session()
-            return session.run(cypher)
+            return this.session.run(cypher)
                 .then(() => {
-                    session.close();
-                    this.driver.close();
                     return true;
                 })
                 .catch(error => {
-                    session.close();
-                    this.driver.close()
                     throw new Error(error);
                 });
         }
@@ -188,30 +163,22 @@ class UserController{
             if(!(i == keys.length - 1)) cypher += ",";
         }
         cypher += "})";
-        const session = this.driver.session()
-        return session.run(cypher)
+        return this.session.run(cypher)
             .then(() => {
-                session.close();
-                this.driver.close();
                 const token = confirmUserPrefix
                     + jwt.sign({userId: data['userId']}, JWT_SECRET,{expiresIn: '1h'});
                 const url = `http://localhost:3000/user/confirm/${token}`
-                console.log("PTOKEN: " + token);
                 sendEmail(data['email'], url);
                 return true;
             })
             .catch(error => {
-                session.close();
-                this.driver.close()
                 throw new Error(error);
             });
     }
 
     public async forgotPassword(email: string): Promise<Boolean> {
-        const session = this.driver.session()
-        return session.run('MATCH (n { email: \'' + email + '\' }) RETURN n')
+        return this.session.run('MATCH (n { email: \'' + email + '\' }) RETURN n')
             .then(result => {
-                session.close();
                 if(result.records.length !== 1){
                     return true; //dont want to notify that the email doesnt exist for security reasons
                 }
@@ -219,89 +186,65 @@ class UserController{
                 const token = forgotPasswordPrefix
                     + jwt.sign({userId: user.userId}, JWT_SECRET,{expiresIn: '1h'});
                 const url = `http://localhost:3000/user/change-password/${token}`
-                console.log("TOKEN: " + token);
                 sendEmail(email, url);
-                this.driver.close();
                 return true;
             })
             .catch(error => {
-                session.close();
-                this.driver.close()
                 throw new Error(error);
             });
     }
 
     public async getAllUsers(): Promise<User[]> {
         let users: any = [];
-        const session = this.driver.session()
-        return session.run('MATCH (n:User) RETURN n')
+        return this.session.run('MATCH (n:User) RETURN n')
             .then(result => {
-                session.close();
                 result.records.forEach(record => {
                     users.push(record.toObject()["n"]["properties"]);
                 })
-                this.driver.close();
                 return users;
             })
             .catch(error => {
-                session.close();
-                this.driver.close()
                 throw new Error(error);
             });
     }
 
     public async getUserById(userId: string): Promise<User[]> {
         let users: any = [];
-        const session = this.driver.session()
-        return session.run('MATCH (n { userId: \'' + userId + '\' }) RETURN n')
+        return this.session.run('MATCH (n:User { userId: \'' + userId + '\' }) RETURN n')
             .then(result => {
-                session.close();
                 result.records.forEach(record => {
                     users.push(record.toObject()["n"]["properties"]);
                 })
-                this.driver.close();
                 return users;
             })
             .catch(error => {
-                session.close();
-                this.driver.close()
                 throw new Error(error);
             });
     }
 
     public async getUserFollowers(userId: string): Promise<User[]> {
         let users: any = [];
-        const session = this.driver.session()
-        return session.run(
+        return this.session.run(
             'MATCH (a:User),(b:User) WHERE ' +
             'b.userId = \'' + userId + '\' ' +
             'MATCH (a)-[r:FOLLOWS]->(b) RETURN a')
             .then(result => {
-                session.close();
                 result.records.forEach(record => {
                     users.push(record.toObject()["a"]["properties"]);
                 })
-                this.driver.close();
                 return users;
             })
             .catch(error => {
-                session.close();
-                this.driver.close()
                 throw new Error(error);
             });
     }
 
     public async getNumFollowers(userId: string): Promise<number> {
-        const session = this.driver.session()
-        return session.run('MATCH ()-[r:FOLLOWS]->(n) WHERE n.userId = \'' + userId + '\' RETURN COUNT(r)')
+        return this.session.run('MATCH ()-[r:FOLLOWS]->(n) WHERE n.userId = \'' + userId + '\' RETURN COUNT(r)')
             .then(result => {
-                session.close();
-                this.driver.close();
                 return result.records[0].toObject()["COUNT(r)"]['low'];
             })
             .catch(error => {
-                session.close();
-                this.driver.close()
                 throw new Error(error);
             });
     }
@@ -312,11 +255,8 @@ class UserController{
                 'MATCH (u:User), (p:User) WHERE u.userId = ' +
                 '"' + userId + '" AND p.userId = "' + followedUser + '"' +
                 ' CREATE (u)-[:FOLLOWS]->(p) WITH u, p MATCH (u)-[r:FOLLOWS]->(p), (u)-[:FOLLOWS]->(p) DELETE r'
-            const session = this.driver.session()
-            return session.run(cypher)
+            return this.session.run(cypher)
                 .then(() => {
-                    session.close();
-                    this.driver.close();
                     if(!isUnfollow){
                         try {
                             this.createUserNotification({
@@ -332,8 +272,6 @@ class UserController{
                     return true;
                 })
                 .catch(error => {
-                    session.close();
-                    this.driver.close()
                     throw new Error(error);
                 });
         }
@@ -348,16 +286,11 @@ class UserController{
     }
 
     public async deleteUserById(userId: string): Promise<Boolean> {
-        const session = this.driver.session()
-        return session.run('MATCH (n { userId: \'' + userId + '\' }) DELETE n')
+        return this.session.run('MATCH (n:User { userId: \'' + userId + '\' }) DELETE n')
             .then(() => {
-                session.close();
-                this.driver.close();
                 return true;
             })
             .catch(error => {
-                session.close();
-                this.driver.close()
                 throw new Error(error);
             });
     }

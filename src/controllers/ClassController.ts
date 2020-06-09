@@ -32,6 +32,7 @@ class ClassController{
         if(picture){
             data = await uploadFileToS3(data, picture, "classi-class-pictures");
         }
+        if(data['scheduledTime'] == null) data['scheduledTime'] = Date.now();
         data['createdAt'] = Date.now();
         data['comments'] = [];
         data['classId'] = "class" + uniqid();

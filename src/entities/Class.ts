@@ -4,6 +4,7 @@ import Equipment from "../enums/Equipment";
 import Difficulty from "../enums/Difficulty";
 import {GraphQLJSONObject} from "graphql-type-json";
 import {Comment} from "./Comment";
+import Duration from "../enums/Duration";
 
 @ObjectType("Class")
 export class Class {
@@ -24,8 +25,8 @@ export class Class {
     requiredEquipment: Equipment;
     @Field(type => Difficulty, { nullable: true })
     difficulty: Difficulty;
-    @Field({ nullable: true })
-    expectedDuration: string;
+    @Field(type => Duration)
+    expectedDuration: Duration;
     @Field()
     isPrivate: boolean;
     @Field()

@@ -1,6 +1,6 @@
 import uniqid from 'uniqid';
 import {Class} from "../entities/Class";
-import {createDocumentClient, Upload, uploadFileToS3} from "../lib/AWS";
+import {createDocumentClient} from "../lib/AWS";
 import NotificationType from "../enums/NotificationType";
 import UserController from "./UserController";
 
@@ -28,10 +28,7 @@ class ClassController{
         });
     };
 
-    public async createClass(data: any, picture?: Upload): Promise<Boolean> {
-        if(picture){
-            data = await uploadFileToS3(data, picture, "classi-class-pictures");
-        }
+    public async createClass(data: any): Promise<Boolean> {
         if(data['scheduledTime'] == null) data['scheduledTime'] = Date.now();
         data['createdAt'] = Date.now();
         data['comments'] = [];
@@ -46,10 +43,7 @@ class ClassController{
         });
     }
 
-    public async updateClassById(classId: string, data?: any, picture?: Upload): Promise<Boolean> {
-        if(picture){
-            data = await uploadFileToS3(data, picture, "classi-profile-pictures");
-        }
+    public async updateClassById(classId: string, data: any): Promise<Boolean> {
         let updateExpression = "SET";
         let expressionAttValues: any = {};
         //construct an update expression for only the values present in the req

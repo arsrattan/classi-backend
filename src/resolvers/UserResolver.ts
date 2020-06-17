@@ -19,12 +19,6 @@ export class UserResolver {
 
     public userController: UserController = new UserController();
 
-    @Query(() => AuthData)
-    async login(@Arg("email") email: string,
-                @Arg("password") password: string){
-        return await this.userController.login(email, password);
-    };
-
     @UseMiddleware(isAuth)
     @Query(() => [User], { nullable: true })
     async getUserById(@Arg("userId") userId: string){
@@ -55,6 +49,12 @@ export class UserResolver {
         return await this.userController.getNumFollowers(userId);
     };
 
+    @Mutation(() => AuthData)
+    async login(@Arg("email") email: string,
+                @Arg("password") password: string){
+        return await this.userController.login(email, password);
+    };
+
     @UseMiddleware(isCorrectUser)
     @Mutation(() => Boolean)
     async toggleFollow(@Arg("userId") userId: string,
@@ -64,9 +64,8 @@ export class UserResolver {
     };
 
     @Mutation(() => Boolean)
-    async registerUser(@Arg("data", {nullable: true}) data: CreateUserInput,
-                       @Arg("picture", () => GraphQLUpload, {nullable: true}) picture: Upload) {
-        return await this.userController.registerUser(data, picture);
+    async registerUser(@Arg("data", {nullable: true}) data: CreateUserInput) {
+        return await this.userController.registerUser(data);
     };
 
     @UseMiddleware(isCorrectUserFromConfirmation)
@@ -90,9 +89,8 @@ export class UserResolver {
     @UseMiddleware(isCorrectUser)
     @Mutation(() => Boolean)
     async updateUser(@Arg("data", {nullable: true}) data: UserInput,
-                     @Arg("userId") userId: string,
-                     @Arg("picture", () => GraphQLUpload, {nullable: true}) picture: Upload) {
-        return await this.userController.updateUser(userId, data, picture);
+                     @Arg("userId") userId: string) {
+        return await this.userController.updateUser(userId, data);
     };
 
     @UseMiddleware(isCorrectUser)

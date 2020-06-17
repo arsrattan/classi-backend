@@ -20,6 +20,8 @@ export class User {
     @Field()
     password: string;
     @Field({nullable: true})
+    s3url: string;
+    @Field({nullable: true})
     biography: string;
     @Field(type => AccountType)
     accountType: AccountType;

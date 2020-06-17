@@ -7,11 +7,11 @@ import {AuthData} from "../entities/AuthData";
 import {Driver} from "neo4j-driver/types/v1/driver";
 import {sendEmail} from "../util/sendEmail";
 import {confirmUserPrefix, forgotPasswordPrefix} from "../util/tokenConstants";
-import {Upload, uploadFileToS3} from "../lib/AWS";
 import {getDecodedToken} from "../auth/isAuth";
 import {JWT_SECRET} from "../util/secrets";
 import NotificationType from "../enums/NotificationType";
 import {Notification} from "../entities/Notification";
+import AccountType from "../enums/AccountType";
 
 class UserController{
     private user: string = process.env.NEO4J_USER;
@@ -131,21 +131,14 @@ class UserController{
         }
     }
 
-    public async registerUser(data: any, picture?: Upload): Promise<Boolean> {
-        await this.getUserById(data['userId']).then(users => {
-            if(users.length == 1){
-                throw new Error('User already exists!');
+    public async registerUser(data: any): Promise<Boolean> {
+        await this.getUserById(data['userId'], data['email']).then(users => {
+            if(users.length >= 1){
+                throw new Error('Username or email already exists!');
             }
         });
-        if(picture){
-            try{
-                data = await uploadFileToS3(data, picture, "classi-profile-pictures");
-            }
-            catch(err){
-                throw new Error(err);
-            }
-        }
         data['createdAt'] = Date.now();
+        data['accountType'] = AccountType.Free;
         data['following'] = [];
         data['followers'] = [];
         data['classHistory'] = [];
@@ -208,9 +201,16 @@ class UserController{
             });
     }
 
-    public async getUserById(userId: string): Promise<User[]> {
+    public async getUserById(userId: string, email?: string): Promise<User[]> {
+        let cypher;
+        if(email != null){
+            cypher = 'MATCH (n:User) WHERE n.userId = \'' + userId + '\' OR n.email = \'' + email + '\' RETURN n'
+        }
+        else {
+            cypher = 'MATCH (n:User { userId: \'' + userId + '\' }) RETURN n'
+        }
         let users: any = [];
-        return this.session.run('MATCH (n:User { userId: \'' + userId + '\' }) RETURN n')
+        return this.session.run(cypher)
             .then(result => {
                 result.records.forEach(record => {
                     users.push(record.toObject()["n"]["properties"]);
@@ -277,12 +277,22 @@ class UserController{
         }
     }
 
-    public async updateUser(userId: string, data?: any, picture?: Upload): Promise<Boolean> {
-        if(picture){
-            data = await uploadFileToS3(data, picture, "classi-profile-pictures");
+    public async updateUser(userId: string, data: any): Promise<Boolean> {
+        let cypher = 'MERGE (n:User { userId: \'' + userId + '\' }) SET';
+        const keys = Object.keys(data)
+        for(let i = 0; i < keys.length; i++){
+            cypher += " n." + keys[i] + " = '" + data[keys[i]] + "'";
+            if(!(i == keys.length - 1)) cypher += ",";
         }
-        //todo
-        return null;
+        cypher += ' RETURN n';
+        console.log(cypher);
+        return this.session.run(cypher)
+            .then(() => {
+                return true;
+            })
+            .catch(error => {
+                throw new Error(error);
+            });
     }
 
     public async deleteUserById(userId: string): Promise<Boolean> {

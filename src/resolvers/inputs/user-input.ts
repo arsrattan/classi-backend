@@ -45,8 +45,4 @@ export class CreateUserInput implements Partial<User> {
     firstName: string;
     @Field()
     lastName: string;
-    @Field({ nullable: true })
-    biography: string;
-    @Field(type => AccountType)
-    accountType: AccountType;
 }

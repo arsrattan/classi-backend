@@ -28,10 +28,7 @@ class PostController{
         });
     };
 
-    public async createPost(data: any, picture?: Upload): Promise<Boolean> {
-        if(picture){
-            data = await uploadFileToS3(data, picture, "classi-profile-pictures");
-        }
+    public async createPost(data: any): Promise<Boolean> {
         data['postId'] = "post" + uniqid();
         data['comments'] = [];
         data['createdAt'] = Date.now();
@@ -45,10 +42,7 @@ class PostController{
         });
     }
 
-    public async updatePostById(postId: string, data?: any, picture?: Upload): Promise<Boolean> {
-        if(picture){
-            data = await uploadFileToS3(data, picture, "classi-profile-pictures");
-        }
+    public async updatePostById(postId: string, data: any): Promise<Boolean> {
         let updateExpression = "SET";
         let expressionAttValues: any = {};
         //construct an update expression for only the values present in the req

@@ -27,16 +27,14 @@ export class PostResolver {
 
     @UseMiddleware(isAuth)
     @Mutation(() => Boolean)
-    async createPost(@Arg("data") data: PostInput,
-                     @Arg("picture", () => GraphQLUpload, {nullable: true}) picture: Upload) {
+    async createPost(@Arg("data") data: PostInput) {
         return await this.postController.createPost(data);
     };
 
     @UseMiddleware(isCorrectUserFromJson)
     @Mutation(() => Boolean)
     async updatePostById(@Arg("data", {nullable: true}) data: PostInput,
-                         @Arg("postId") postId: string,
-                         @Arg("picture", () => GraphQLUpload, {nullable: true}) picture: Upload) {
+                         @Arg("postId") postId: string) {
         return await this.postController.updatePostById(postId, data);
     };
 

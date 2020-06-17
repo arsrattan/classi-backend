@@ -19,6 +19,8 @@ export class Class {
     classType: ClassType;
     @Field()
     instructorUserId: string;
+    @Field({nullable: true})
+    s3url: string;
     @Field({ nullable: true })
     description: string;
     @Field(type => Equipment)

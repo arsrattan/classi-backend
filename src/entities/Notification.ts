@@ -12,6 +12,8 @@ export class Notification {
     @Field({nullable: true})
     triggeringUserId: string;
     @Field({nullable: true})
+    triggeringUserS3Url: string;
+    @Field({nullable: true})
     triggeringClassId: string;
     @Field(type => NotificationType)
     notificationType: NotificationType

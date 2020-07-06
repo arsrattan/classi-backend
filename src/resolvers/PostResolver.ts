@@ -31,10 +31,11 @@ export class PostResolver {
         return await this.postController.createPost(data);
     };
 
-    @UseMiddleware(isCorrectUserFromJson)
+    @UseMiddleware(isCorrectUser)
     @Mutation(() => Boolean)
     async updatePostById(@Arg("data", {nullable: true}) data: PostInput,
-                         @Arg("postId") postId: string) {
+                         @Arg("postId") postId: string,
+                         @Arg("userId") userId: string) {
         return await this.postController.updatePostById(postId, data);
     };
 

@@ -22,14 +22,8 @@ export class UserInput implements Partial<User> {
     biography: string;
     @Field(type => AccountType, { nullable: true })
     accountType: AccountType;
-    @Field(_type => GraphQLJSONObject, { nullable: true })
-    classHistory: Class[];
-    @Field(_type => GraphQLJSONObject, { nullable: true })
-    registeredClasses: Class[];
-    @Field(_type => GraphQLJSONObject, { nullable: true })
-    followers: User[];
-    @Field(_type => GraphQLJSONObject, { nullable: true })
-    following: User[];
+    @Field({nullable: true})
+    s3url: string;
 }
 
 @InputType()
@@ -45,4 +39,6 @@ export class CreateUserInput implements Partial<User> {
     firstName: string;
     @Field()
     lastName: string;
+    @Field({nullable: true})
+    s3url: string;
 }

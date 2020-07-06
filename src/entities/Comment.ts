@@ -7,6 +7,8 @@ export class Comment {
     commentId!: string;
     @Field()
     createdBy: string;
+    @Field({nullable: true})
+    users3url: string;
     @Field()
     message: string;
     @Field()

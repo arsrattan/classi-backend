@@ -28,14 +28,6 @@ export class User {
     @Field()
     createdAt: number;
     @Field(_type => GraphQLJSONObject)
-    classHistory: Class[];
-    @Field(_type => GraphQLJSONObject)
-    registeredClasses: Class[];
-    @Field(_type => GraphQLJSONObject)
-    followers: User[];
-    @Field(_type => GraphQLJSONObject)
-    following: User[];
-    @Field(_type => GraphQLJSONObject)
     notifications: Notification[];
     @Field()
     confirmed: boolean;

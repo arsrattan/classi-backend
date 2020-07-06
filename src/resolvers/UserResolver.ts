@@ -37,6 +37,12 @@ export class UserResolver {
         return await this.userController.getUserFollowers(userId);
     };
 
+    @UseMiddleware(isAuth)
+    @Query(() => [User], { nullable: true })
+    async getUserFollowing(@Arg("userId") userId: string){
+        return await this.userController.getUserFollowing(userId);
+    };
+
     @UseMiddleware(isCorrectUser)
     @Query(() => [Notification], { nullable: true })
     async getUserNotifications(@Arg("userId") userId: string){

@@ -4,11 +4,13 @@ import PostType from "../../enums/PostType";
 
 @InputType()
 export class PostInput implements Partial<Post> {
-    @Field()
+    @Field({nullable: true})
     createdBy: string
     @Field({nullable: true})
+    users3url: string;
+    @Field({nullable: true})
     caption: string;
-    @Field(type => PostType)
+    @Field(type => PostType, {nullable: true})
     postType: PostType;
     @Field({nullable: true})
     classId: string;

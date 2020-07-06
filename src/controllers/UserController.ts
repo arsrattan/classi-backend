@@ -77,6 +77,10 @@ class UserController{
     public async createUserNotification(data: any): Promise<Boolean> {
         data['createdAt'] = Date.now();
         data['notificationId'] = "notification" + uniqid();
+        if(data['triggeringUserId']){
+            const userData = await this.getUserById(data['triggeringUserId']);
+            data['triggeringUserS3Url'] = userData[0]['s3url'];
+        }
         let cypher: string =
             'match(u:User) where u.userId="' + data['userId'] + '"' +
             ' create (u)-[r:HAS_NOTIFICATION]->(n:Notification{';
@@ -139,10 +143,6 @@ class UserController{
         });
         data['createdAt'] = Date.now();
         data['accountType'] = AccountType.Free;
-        data['following'] = [];
-        data['followers'] = [];
-        data['classHistory'] = [];
-        data['registeredClasses'] = [];
         const hash = await(this.hashPassword(data['password']));
         let cypher = "CREATE (n:User { "
         const keys = Object.keys(data)
@@ -239,6 +239,23 @@ class UserController{
             });
     }
 
+    public async getUserFollowing(userId: string): Promise<User[]> {
+        let users: any = [];
+        return this.session.run(
+            'MATCH (a:User),(b:User) WHERE ' +
+            'a.userId = \'' + userId + '\' ' +
+            'MATCH (a)-[r:FOLLOWS]->(b) RETURN b')
+            .then(result => {
+                result.records.forEach(record => {
+                    users.push(record.toObject()["b"]["properties"]);
+                })
+                return users;
+            })
+            .catch(error => {
+                throw new Error(error);
+            });
+    }
+
     public async getNumFollowers(userId: string): Promise<number> {
         return this.session.run('MATCH ()-[r:FOLLOWS]->(n) WHERE n.userId = \'' + userId + '\' RETURN COUNT(r)')
             .then(result => {
@@ -285,7 +302,6 @@ class UserController{
             if(!(i == keys.length - 1)) cypher += ",";
         }
         cypher += ' RETURN n';
-        console.log(cypher);
         return this.session.run(cypher)
             .then(() => {
                 return true;

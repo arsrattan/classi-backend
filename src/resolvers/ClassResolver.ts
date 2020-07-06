@@ -64,11 +64,10 @@ export class ClassResolver {
 
     @UseMiddleware(isCorrectUser)
     @Mutation(() => Boolean)
-    async joinClass(@Arg("userId") userId: string,
-                    @Arg("classCreator") classCreator: string,
+    async registerForClass(@Arg("userId") userId: string,
                     @Arg("classId") classId: string,
-                    @Arg("isUnjoin") isUnjoin: boolean) {
-        return await this.classController.joinClass(userId, classCreator, classId, isUnjoin);
+                    @Arg("scheduledTime") scheduledTime: number) {
+        return await this.classController.registerForClass(userId, classId, scheduledTime);
     };
 
     @UseMiddleware(isCorrectUser)

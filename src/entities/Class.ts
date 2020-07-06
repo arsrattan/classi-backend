@@ -15,20 +15,26 @@ export class Class {
     className: string;
     @Field({nullable: true})
     imageKey: string;
-    @Field(type => ClassType)
-    classType: ClassType;
+    @Field()
+    classType: string;
     @Field()
     instructorUserId: string;
     @Field({nullable: true})
-    s3url: string;
+    channel_thumbnail_url: string;
+    @Field({nullable: true})
+    class_image_url: string;
     @Field({ nullable: true })
     description: string;
-    @Field(type => Equipment)
+    @Field(type => Equipment, { nullable: true })
     requiredEquipment: Equipment;
-    @Field(type => Difficulty, { nullable: true })
-    difficulty: Difficulty;
-    @Field(type => Duration)
-    expectedDuration: Duration;
+    @Field({ nullable: true })
+    difficulty: string;
+    @Field({nullable: true})
+    playlist_id: string;
+    @Field({nullable: true})
+    view_count: string;
+    @Field()
+    expectedDuration: string;
     @Field()
     isPrivate: boolean;
     @Field()
@@ -39,6 +45,4 @@ export class Class {
     comments: Comment[];
     @Field( _type => GraphQLJSONObject, {nullable: true})
     likes: any; //set of userids
-    @Field( _type => GraphQLJSONObject, {nullable: true})
-    registeredUsers: any; //set of userids
 }

@@ -10,4 +10,6 @@ export class CreateCommentInput implements Partial<Comment> {
     message: string;
     @Field({nullable: true})
     parentCommentId: string;
+    @Field({nullable: true})
+    users3url: string;
 }

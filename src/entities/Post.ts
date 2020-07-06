@@ -9,6 +9,8 @@ export class Post {
     postId!: string;
     @Field()
     createdBy: string;
+    @Field()
+    users3url: string;
     @Field({nullable: true})
     classId: string;
     @Field({nullable: true})

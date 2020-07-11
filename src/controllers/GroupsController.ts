@@ -8,7 +8,7 @@ class GroupsController {
     private docClinet = createDocumentClient("Group");
 
 
-    public async getWorkoutGroup(groupId): Promise<Group> {
+    public async getWorkoutGroup(groupId): Promise<Group[]> {
         const params = { 
             TableName: "GroupsTable", 
             KeyConditionExpression: 'groupId = :i',
@@ -26,6 +26,7 @@ class GroupsController {
         data["savedClasses"] = [];
         data["scheduledClasses"] = [];
         data["pastClasses"] = [];
+        return false;
     }
 }
 

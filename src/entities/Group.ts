@@ -1,4 +1,4 @@
-import Registration from './Registration'; 
+import {Registration} from './Registration'; 
 import {GraphQLJSONObject} from "graphql-type-json";
 import {Field, ID, ObjectType} from "type-graphql";
 

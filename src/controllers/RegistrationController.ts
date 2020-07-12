@@ -1,6 +1,6 @@
 import uniqid from 'uniqid';
 import {createDocumentClient} from "../lib/AWS";
-import {Registration} from "../entities/Registration";
+import Registration from "../entities/Registration";
 
 
 class RegistrationController{

@@ -24,7 +24,7 @@ export class UserInput implements Partial<User> {
     accountType: AccountType;
     @Field({nullable: true})
     s3url: string;
-    @Field({ nullable: true })
+    @Field(_type => GraphQLJSONObject, {nullable: true})
     userGroups: string[];
 }
 
@@ -43,6 +43,6 @@ export class CreateUserInput implements Partial<User> {
     lastName: string;
     @Field({nullable: true})
     s3url: string;
-    @Field({ nullable: true })
+    @Field(_type => GraphQLJSONObject, {nullable: true})
     userGroups: string[];
 }

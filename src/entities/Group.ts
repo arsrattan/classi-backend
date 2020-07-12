@@ -12,16 +12,16 @@ export default class Group {
     @Field()
     name: string; //groupName
     
-    @Field()
+    @Field(_type => GraphQLJSONObject, {nullable: true})
     members: string[]; // array of userIds 
     
-    @Field({nullable: true})
+    @Field(_type => GraphQLJSONObject, {nullable: true})
     savedClasses: string[];
     
-    @Field({nullable: true})
+    @Field(_type => Registration, {nullable: true})
     scheduledClasses: Registration[]; // array of class ids 
     
-    @Field({nullable: true})
+    @Field(_type => Registration, {nullable: true})
     pastClasses: Registration[]; //pick any user and scan table for groupId
     
     @Field()

@@ -358,10 +358,16 @@ class UserController{
     }
 
     // adds group to all users' groups list 
-    public async batchAddGroupById(userIds: string[], groupId) {
+    public async batchAddGroupById(userIds: string[], groupId): Promise<Boolean> {
         const addGroupsPromises = userIds.map (id => 
             this.addGroupById(id, groupId));
-        await Promise.all(addGroupsPromises);
+        try {
+            await Promise.all(addGroupsPromises);
+            return true;
+        } catch (err) {
+            console.log(err)
+        }   
+        
     }
 
     // deletes a group from a user's group list

@@ -184,7 +184,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/classi-backend/dev/1594592429841-2020-07-12T22:20:29.841Z/classi-backend.zip"
+                "S3Key": "serverless/classi-backend/dev/1594593623463-2020-07-12T22:40:23.463Z/classi-backend.zip"
               },
               "FunctionName": "classi-backend-dev-graphql",
               "Handler": "src/graphql.graphqlHandler",
@@ -207,14 +207,14 @@
               "GraphqlLogGroup"
             ]
           },
-          "GraphqlLambdaVersionRXO0m6Myz1IHdLJKy8xzCxK2opoUwgjAVFeNGUkSg": {
+          "GraphqlLambdaVersionAq3keloV7jPgE7V6jcCiGcdmYbTLUcoJsqPa2l2ETc": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "GraphqlLambdaFunction"
               },
-              "CodeSha256": "sQyzVsLRdAXk34WKCZz6WJOS9bCaoAB6EeHaQsnSkgU="
+              "CodeSha256": "oWPRMvPaXZ5Ddb+SwIDDJTlAagiJNIvUQuVFyqGVdWs="
             }
           },
           "ApiGatewayRestApi": {
@@ -376,7 +376,7 @@
               "MethodResponses": []
             }
           },
-          "ApiGatewayDeployment1594592397292": {
+          "ApiGatewayDeployment1594593592387": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -437,7 +437,7 @@
           "GraphqlLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "GraphqlLambdaVersionRXO0m6Myz1IHdLJKy8xzCxK2opoUwgjAVFeNGUkSg"
+              "Ref": "GraphqlLambdaVersionAq3keloV7jPgE7V6jcCiGcdmYbTLUcoJsqPa2l2ETc"
             }
           },
           "ServiceEndpoint": {
@@ -611,7 +611,7 @@
         "timeout": 6,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "GraphqlLambdaVersionRXO0m6Myz1IHdLJKy8xzCxK2opoUwgjAVFeNGUkSg"
+        "versionLogicalId": "GraphqlLambdaVersionAq3keloV7jPgE7V6jcCiGcdmYbTLUcoJsqPa2l2ETc"
       }
     },
     "serviceFilename": "serverless.yml",
@@ -619,7 +619,7 @@
     "isDashboardMonitoringPreconfigured": false
   },
   "package": {
-    "artifactDirectoryName": "serverless/classi-backend/dev/1594592429841-2020-07-12T22:20:29.841Z",
+    "artifactDirectoryName": "serverless/classi-backend/dev/1594593623463-2020-07-12T22:40:23.463Z",
     "artifact": ""
   }
 }

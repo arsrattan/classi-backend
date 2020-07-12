@@ -122,7 +122,7 @@ export class UserResolver {
 
     @UseMiddleware(isCorrectUser)
     @Mutation(() => Boolean)
-    async batchAddGroupById(@Arg("userIds") userIds: string[],
+    async batchAddGroupById(@Arg("userIds") userIds: [string],
         @Arg("groupId") groupId: string) {
         return await this.userController.batchAddGroupById(userIds, groupId);
     }

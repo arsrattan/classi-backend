@@ -1,5 +1,5 @@
 import {InputType, Field, ID} from "type-graphql";
-import {Registration} from "../../entities/Registration";
+import Registration from "../../entities/Registration";
 
 @InputType()
 export class RegistrationInput implements Partial<Registration> {

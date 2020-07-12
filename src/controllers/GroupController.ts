@@ -5,7 +5,7 @@ import Group from "../entities/Group";
 import { createDocumentClient } from "../lib/AWS";
 import UserController from "./UserController";
 
-const groupTable = "class-workout-groups" // move to config file later
+const groupTable = "classi-workout-groups" // move to config file later
 
 class GroupController {
     private docClient = createDocumentClient("Group");

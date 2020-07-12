@@ -14,6 +14,7 @@ Learn more at our landing page [here.](class.live)
 * Users can post their class activity to their feed
 * Users can see activity from the people they follow 
 * Users receive in-app notifications
+* Users can create, delete, update workout groups
 ### Recommendation Engine
 * Rank classes using a simple regression algorithm 
 * Inputs:

@@ -11,12 +11,15 @@ import {getDecodedToken} from "../auth/isAuth";
 import {JWT_SECRET} from "../util/secrets";
 import NotificationType from "../enums/NotificationType";
 import {Notification} from "../entities/Notification";
+import {Group} from "../entities/Group";
+import GroupController from "../controllers/GroupController";
 import AccountType from "../enums/AccountType";
 
 class UserController{
     private user: string = process.env.NEO4J_USER;
     private password: string = process.env.NEO4J_PASSWORD;
     private host: string = process.env.NEO4J_IP;
+    private groupContorller: GroupController = new GroupController();
 
     public driver: Driver = neo4j.v1.driver(
         "bolt://" + this.host,
@@ -320,6 +323,74 @@ class UserController{
                 throw new Error(error);
             });
     }
+
+    // returns the all of the user's Groups 
+    public async getUserGroupsById(userId: string): Promise<Group[]> {
+        const user = await this.getUserById(userId);
+        const groups: string[] = user[0].userGroups;
+        return this.groupContorller.batchGetWorkoutGroupByIds(groups);
+    }
+
+    // adds a group to the user's groups list
+    public async addGroupById(userId: string, groupId: string): Promise<Boolean> {
+        const user = await this.getUserById(userId);
+        const groupsList: string[] = user[0].userGroups;
+        
+        if (!groupsList.includes(groupId)){ 
+            groupsList.push(groupId);
+            // call neo4j to update
+            const data = {userGroups: groupsList};
+            try {
+                await this.updateUser(userId, data);
+                return true;
+            } catch (err){
+                console.log(`Could not add ${groupId} to ${userId}'s groups`)
+                return false;
+            }
+            
+        } else if (groupsList.includes(groupId) ) {
+            console.log(`${userId} is already is part of ${groupId}`);
+            return true;
+        }
+        
+        console.log(`Could not add ${groupId} to ${userId}'s groups`);
+        return false; 
+    }
+
+    // adds group to all users' groups list 
+    public async batchAddGroupById(userIds: string[], groupId) {
+        const addGroupsPromises = userIds.map (id => 
+            this.addGroupById(id, groupId));
+        await Promise.all(addGroupsPromises);
+    }
+
+    // deletes a group from a user's group list
+    public async deleteGroupById (userId: string, groupId: string): Promise<Boolean> {
+        const user = await this.getUserById(userId);
+        const groupsList: string[] = user[0].userGroups;
+        
+        if (groupsList.includes(groupId)){ 
+            const removeGroups = groupsList.filter(function(value) {
+                return value !== groupId
+            })
+            // update neo4j
+            const data = {userGroups: removeGroups};
+            try {
+                await this.updateUser(userId, data);
+                return true;
+            } catch (err){
+                console.log(`Could not remove ${groupId} from ${userId}'s groups`)
+                return false;
+            }
+
+        } else if (!groupsList.includes(groupId) ) {
+            console.log(`${groupId} is not part of ${userId}'s groups`);
+            return true;
+        }
+        console.log(`Could not delete ${groupId} from ${userId} for some other reason`);
+        return false;
+    }
+
 }
 
 export default UserController;

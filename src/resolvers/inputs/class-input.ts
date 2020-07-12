@@ -16,9 +16,9 @@ export class UpdateClassInput implements Partial<Class> {
     classType: string;
     @Field({ nullable: true })
     description: string;
-    @Field({nullable: true})
+    @Field({ nullable: true })
     channel_thumbnail_url: string;
-    @Field({nullable: true})
+    @Field({ nullable: true })
     class_image_url: string;
     @Field(type => Equipment, { nullable: true })
     requiredEquipment: Equipment;

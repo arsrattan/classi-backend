@@ -31,4 +31,7 @@ export class User {
     notifications: Notification[];
     @Field()
     confirmed: boolean;
+
+    @Field({nullable: true})
+    userGroups: string[] // array of groupIds a user is a part of
 }

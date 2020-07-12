@@ -31,12 +31,14 @@ const tokenConstants_1 = require("../util/tokenConstants");
 const isAuth_1 = require("../auth/isAuth");
 const secrets_1 = require("../util/secrets");
 const NotificationType_1 = __importDefault(require("../enums/NotificationType"));
+const GroupController_1 = __importDefault(require("../controllers/GroupController"));
 const AccountType_1 = __importDefault(require("../enums/AccountType"));
 class UserController {
     constructor() {
         this.user = process.env.NEO4J_USER;
         this.password = process.env.NEO4J_PASSWORD;
         this.host = process.env.NEO4J_IP;
+        this.groupContorller = new GroupController_1.default();
         this.driver = neo4j.v1.driver("bolt://" + this.host, neo4j.v1.auth.basic(this.user, this.password), { encrypted: 'ENCRYPTION_OFF' });
         this.session = this.driver.session();
     }
@@ -315,6 +317,67 @@ class UserController {
             .catch(error => {
             throw new Error(error);
         });
+    }
+    async getUserGroupsById(userId) {
+        const user = await this.getUserById(userId);
+        const groups = user[0].userGroups;
+        return this.groupContorller.batchGetWorkoutGroupByIds(groups);
+    }
+    async addGroupById(userId, groupId) {
+        const user = await this.getUserById(userId);
+        const groupsList = user[0].userGroups;
+        if (!groupsList.includes(groupId)) {
+            groupsList.push(groupId);
+            const data = { userGroups: groupsList };
+            try {
+                await this.updateUser(userId, data);
+                return true;
+            }
+            catch (err) {
+                console.log(`Could not add ${groupId} to ${userId}'s groups`);
+                return false;
+            }
+        }
+        else if (groupsList.includes(groupId)) {
+            console.log(`${userId} is already is part of ${groupId}`);
+            return true;
+        }
+        console.log(`Could not add ${groupId} to ${userId}'s groups`);
+        return false;
+    }
+    async batchAddGroupById(userIds, groupId) {
+        const addGroupsPromises = userIds.map(id => this.addGroupById(id, groupId));
+        try {
+            await Promise.all(addGroupsPromises);
+            return true;
+        }
+        catch (err) {
+            console.log(err);
+        }
+    }
+    async deleteGroupById(userId, groupId) {
+        const user = await this.getUserById(userId);
+        const groupsList = user[0].userGroups;
+        if (groupsList.includes(groupId)) {
+            const removeGroups = groupsList.filter(function (value) {
+                return value !== groupId;
+            });
+            const data = { userGroups: removeGroups };
+            try {
+                await this.updateUser(userId, data);
+                return true;
+            }
+            catch (err) {
+                console.log(`Could not remove ${groupId} from ${userId}'s groups`);
+                return false;
+            }
+        }
+        else if (!groupsList.includes(groupId)) {
+            console.log(`${groupId} is not part of ${userId}'s groups`);
+            return true;
+        }
+        console.log(`Could not delete ${groupId} from ${userId} for some other reason`);
+        return false;
     }
 }
 exports.default = UserController;

@@ -30,11 +30,11 @@ __decorate([
 ], Registration.prototype, "classId", void 0);
 __decorate([
     type_graphql_1.Field(),
-    __metadata("design:type", Date)
+    __metadata("design:type", Number)
 ], Registration.prototype, "scheduledTime", void 0);
 __decorate([
     type_graphql_1.Field(),
-    __metadata("design:type", String)
+    __metadata("design:type", Number)
 ], Registration.prototype, "createdAt", void 0);
 Registration = __decorate([
     type_graphql_1.ObjectType("Registration")

@@ -66,6 +66,10 @@ __decorate([
     type_graphql_1.Field(),
     __metadata("design:type", Boolean)
 ], User.prototype, "confirmed", void 0);
+__decorate([
+    type_graphql_1.Field(_type => graphql_type_json_1.GraphQLJSONObject, { nullable: true }),
+    __metadata("design:type", Array)
+], User.prototype, "userGroups", void 0);
 User = __decorate([
     type_graphql_1.ObjectType("User")
 ], User);

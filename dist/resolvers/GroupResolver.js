@@ -20,12 +20,25 @@ const type_graphql_1 = require("type-graphql");
 const Group_1 = __importDefault(require("../entities/Group"));
 const isAuth_1 = require("../auth/isAuth");
 const GroupController_1 = __importDefault(require("../controllers/GroupController"));
+const group_input_1 = require("./inputs/group-input");
 let GroupResolver = class GroupResolver {
     constructor() {
         this.groupController = new GroupController_1.default();
     }
     async getGroupById(groupId) {
-        return await this.groupController.getWorkoutGroup(groupId);
+        return await this.groupController.getWorkoutGroupById(groupId);
+    }
+    ;
+    async createGroup(data) {
+        return await this.groupController.createGroup(data);
+    }
+    ;
+    async updateGroupById(data, groupId) {
+        return await this.groupController.updateGroupById(groupId, data);
+    }
+    ;
+    async deleteGroupById(groupId, userId) {
+        return await this.groupController.deleteGroupById(groupId, userId);
     }
     ;
 };
@@ -37,6 +50,32 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], GroupResolver.prototype, "getGroupById", null);
+__decorate([
+    type_graphql_1.UseMiddleware(isAuth_1.isAuth),
+    type_graphql_1.Mutation(() => Boolean),
+    __param(0, type_graphql_1.Arg("data")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [group_input_1.CreateGroupInput]),
+    __metadata("design:returntype", Promise)
+], GroupResolver.prototype, "createGroup", null);
+__decorate([
+    type_graphql_1.UseMiddleware(isAuth_1.isAuth),
+    type_graphql_1.Mutation(() => Boolean),
+    __param(0, type_graphql_1.Arg("data", { nullable: true })),
+    __param(1, type_graphql_1.Arg("groupId")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [group_input_1.UpdateGroupInput, String]),
+    __metadata("design:returntype", Promise)
+], GroupResolver.prototype, "updateGroupById", null);
+__decorate([
+    type_graphql_1.UseMiddleware(isAuth_1.isAuth),
+    type_graphql_1.Mutation(() => Boolean),
+    __param(0, type_graphql_1.Arg("groupId")),
+    __param(1, type_graphql_1.Arg("userId")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], GroupResolver.prototype, "deleteGroupById", null);
 GroupResolver = __decorate([
     type_graphql_1.Resolver()
 ], GroupResolver);

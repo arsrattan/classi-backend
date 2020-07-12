@@ -8,8 +8,9 @@ const apollo_server_lambda_1 = require("apollo-server-lambda");
 const UserResolver_1 = require("./resolvers/UserResolver");
 const ClassResolver_1 = require("./resolvers/ClassResolver");
 const PostResolver_1 = require("./resolvers/PostResolver");
+const RegistrationResolver_1 = require("./resolvers/RegistrationResolver");
 const schema = type_graphql_1.buildSchemaSync({
-    resolvers: [UserResolver_1.UserResolver, ClassResolver_1.ClassResolver, PostResolver_1.PostResolver],
+    resolvers: [UserResolver_1.UserResolver, ClassResolver_1.ClassResolver, PostResolver_1.PostResolver, RegistrationResolver_1.RegistrationResolver],
     validate: false,
 });
 const graphQlServer = new apollo_server_lambda_1.ApolloServer({

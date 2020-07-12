@@ -120,12 +120,12 @@ export class UserResolver {
         return await this.userController.addGroupById(userId, groupId);
     }
 
-    @UseMiddleware(isCorrectUser)
-    @Mutation(() => Boolean)
-    async batchAddGroupById(@Arg("userIds") userIds: [string],
-        @Arg("groupId") groupId: string) {
-        return await this.userController.batchAddGroupById(userIds, groupId);
-    }
+    // @UseMiddleware(isCorrectUser)
+    // @Mutation(() => Boolean)
+    // async batchAddGroupById(@Arg("userIds") userIds: [string],
+    //     @Arg("groupId") groupId: string) {
+    //     return await this.userController.batchAddGroupById(userIds, groupId);
+    // }
 
 
     @UseMiddleware(isCorrectUser)

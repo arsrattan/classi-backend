@@ -23,6 +23,7 @@ const user_input_1 = require("./inputs/user-input");
 const AuthData_1 = require("../entities/AuthData");
 const isAuth_1 = require("../auth/isAuth");
 const Notification_1 = require("../entities/Notification");
+const Group_1 = __importDefault(require("../entities/Group"));
 let UserResolver = class UserResolver {
     constructor() {
         this.userController = new UserController_1.default();
@@ -81,6 +82,15 @@ let UserResolver = class UserResolver {
     ;
     async deleteUserById(userId) {
         return await this.userController.deleteUserById(userId);
+    }
+    async getUserGroupsById(userId) {
+        return await this.userController.getUserGroupsById(userId);
+    }
+    async addGroupById(userId, groupId) {
+        return await this.userController.addGroupById(userId, groupId);
+    }
+    async deleteGroupById(userId, groupId) {
+        return await this.userController.deleteGroupById(userId, groupId);
     }
 };
 __decorate([
@@ -196,6 +206,32 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "deleteUserById", null);
+__decorate([
+    type_graphql_1.UseMiddleware(isAuth_1.isAuth),
+    type_graphql_1.Query(() => [Group_1.default], { nullable: true }),
+    __param(0, type_graphql_1.Arg("userId")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "getUserGroupsById", null);
+__decorate([
+    type_graphql_1.UseMiddleware(isAuth_1.isCorrectUser),
+    type_graphql_1.Mutation(() => Boolean),
+    __param(0, type_graphql_1.Arg("userId")),
+    __param(1, type_graphql_1.Arg("groupId")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "addGroupById", null);
+__decorate([
+    type_graphql_1.UseMiddleware(isAuth_1.isCorrectUser),
+    type_graphql_1.Mutation(() => Boolean),
+    __param(0, type_graphql_1.Arg("userId")),
+    __param(1, type_graphql_1.Arg("groupId")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "deleteGroupById", null);
 UserResolver = __decorate([
     type_graphql_1.Resolver()
 ], UserResolver);

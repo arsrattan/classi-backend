@@ -16,6 +16,7 @@ exports.CreateUserInput = exports.UserInput = void 0;
 const type_graphql_1 = require("type-graphql");
 const class_validator_1 = require("class-validator");
 const AccountType_1 = __importDefault(require("../../enums/AccountType"));
+const graphql_type_json_1 = require("graphql-type-json");
 let UserInput = class UserInput {
 };
 __decorate([
@@ -51,6 +52,10 @@ __decorate([
     type_graphql_1.Field({ nullable: true }),
     __metadata("design:type", String)
 ], UserInput.prototype, "s3url", void 0);
+__decorate([
+    type_graphql_1.Field(_type => graphql_type_json_1.GraphQLJSONObject, { nullable: true }),
+    __metadata("design:type", Array)
+], UserInput.prototype, "userGroups", void 0);
 UserInput = __decorate([
     type_graphql_1.InputType()
 ], UserInput);
@@ -82,6 +87,10 @@ __decorate([
     type_graphql_1.Field({ nullable: true }),
     __metadata("design:type", String)
 ], CreateUserInput.prototype, "s3url", void 0);
+__decorate([
+    type_graphql_1.Field(_type => graphql_type_json_1.GraphQLJSONObject, { nullable: true }),
+    __metadata("design:type", Array)
+], CreateUserInput.prototype, "userGroups", void 0);
 CreateUserInput = __decorate([
     type_graphql_1.InputType()
 ], CreateUserInput);

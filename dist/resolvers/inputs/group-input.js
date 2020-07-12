@@ -8,9 +8,14 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateGroupInput = exports.UpdateGroupInput = void 0;
 const type_graphql_1 = require("type-graphql");
+const Registration_1 = __importDefault(require("../../entities/Registration"));
+const graphql_type_json_1 = require("graphql-type-json");
 let UpdateGroupInput = class UpdateGroupInput {
 };
 __decorate([
@@ -22,15 +27,15 @@ __decorate([
     __metadata("design:type", String)
 ], UpdateGroupInput.prototype, "name", void 0);
 __decorate([
-    type_graphql_1.Field({ nullable: true }),
+    type_graphql_1.Field(_type => graphql_type_json_1.GraphQLJSONObject, { nullable: true }),
     __metadata("design:type", Array)
 ], UpdateGroupInput.prototype, "members", void 0);
 __decorate([
-    type_graphql_1.Field({ nullable: true }),
+    type_graphql_1.Field(_type => graphql_type_json_1.GraphQLJSONObject, { nullable: true }),
     __metadata("design:type", Array)
 ], UpdateGroupInput.prototype, "savedClasses", void 0);
 __decorate([
-    type_graphql_1.Field({ nullable: true }),
+    type_graphql_1.Field(type => Registration_1.default, { nullable: true }),
     __metadata("design:type", Array)
 ], UpdateGroupInput.prototype, "scheduledClasses", void 0);
 UpdateGroupInput = __decorate([

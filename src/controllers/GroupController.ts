@@ -3,12 +3,14 @@ import uniqid from 'uniqid';
 import Group from "../entities/Group";
 // import {Registration} from "../entities/Registration";
 import { createDocumentClient } from "../lib/AWS";
+import UserController from "./UserController";
 
 const groupTable = "class-workout-groups" // move to config file later
 
 class GroupController {
     private docClient = createDocumentClient("Group");
-
+    private userController = new UserController();
+    
     // get workoutGroups by id
     public async getWorkoutGroupById(groupId): Promise<Group[]> {
         const params = {
@@ -72,8 +74,9 @@ class GroupController {
         }
     }
 
+    // do not use this method to update members list
     public async updateGroupById(groupId: string, data: any): Promise<Boolean> {
-        //if data["members"] is defined then need to update each user with updated groups list
+        // do not use this method to update members list
 
         let updateExpression = "SET";
         let expressionAttValues: any = {};

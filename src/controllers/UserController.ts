@@ -11,7 +11,7 @@ import {getDecodedToken} from "../auth/isAuth";
 import {JWT_SECRET} from "../util/secrets";
 import NotificationType from "../enums/NotificationType";
 import {Notification} from "../entities/Notification";
-import {Group} from "../entities/Group";
+import Group from "../entities/Group";
 import GroupController from "../controllers/GroupController";
 import AccountType from "../enums/AccountType";
 

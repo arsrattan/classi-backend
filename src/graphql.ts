@@ -5,10 +5,11 @@ import {ApolloServer} from "apollo-server-lambda";
 import {UserResolver} from "./resolvers/UserResolver";
 import {ClassResolver} from "./resolvers/ClassResolver";
 import {PostResolver} from "./resolvers/PostResolver";
+import {RegistrationResolver} from "./resolvers/RegistrationResolver";
 
 
 const schema = buildSchemaSync({
-    resolvers: [UserResolver, ClassResolver, PostResolver],
+    resolvers: [UserResolver, ClassResolver, PostResolver, RegistrationResolver],
     validate: false,
     //authMode: "null",
 });

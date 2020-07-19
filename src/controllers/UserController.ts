@@ -85,7 +85,7 @@ class UserController {
         .V()
         .has("user", "username", username)
         .values("userId")
-        .count();
+        .asList();
 
       console.log(
         `Found ${usersWithSameUsername} users with the same username`
@@ -108,7 +108,7 @@ class UserController {
     password: string,
     dateOfBirth: string
   ) {
-    console.log(`The graph currently has ${this.g.V().count} vertices`);
+    console.log(`The graph currently has ${this.g.V().count()} vertices`);
 
     if (this.emailBelongsToExistingUser(email)) {
       throw new Error(

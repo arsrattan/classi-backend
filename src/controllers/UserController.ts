@@ -16,17 +16,24 @@ import NotificationType from "../enums/NotificationType";
 import { Notification } from "../entities/Notification";
 import AccountType from "../enums/AccountType";
 import gremlin from "gremlin";
+import { uuid } from "uuidv4";
+
 const DriverRemoteConnection = gremlin.driver.DriverRemoteConnection;
 const Graph = gremlin.structure.Graph;
+const graph = new Graph();
 
 class UserController {
   private user: string = process.env.NEO4J_USER;
   private password: string = process.env.NEO4J_PASSWORD;
   private host: string = process.env.NEO4J_IP;
-  private dc = new DriverRemoteConnection(
-    "wss://neptunedbinstance-cti8rfcktrww.cjqgcta10amy.us-east-1.neptune.amazonaws.com:8182/gremlin",
-    {}
-  );
+  private g = graph
+    .traversal()
+    .withRemote(
+      new DriverRemoteConnection(
+        "wss://neptunedbinstance-cti8rfcktrww.cjqgcta10amy.us-east-1.neptune.amazonaws.com:8182/gremlin",
+        {}
+      )
+    );
 
   public driver: Driver = neo4j.v1.driver(
     "bolt://" + this.host,
@@ -48,16 +55,94 @@ class UserController {
   }
 
   public async login(username: string, password: string): Promise<AuthData> {
-    console.log("here");
-    const graph = new Graph();
-    const g = graph.traversal().withRemote(this.dc);
-    const data = await g.V().limit(1).count().next();
+    const data = await this.g.V().limit(1).count().next();
     console.log(`Data: ${data}`);
     return {
       accessToken: "",
       userId: "",
       expirationInHours: 1,
     };
+  }
+
+  private async emailBelongsToExistingUser(email: string) {
+    try {
+      const usersWithSameEmail = await this.g
+        .V()
+        .has("user", "email", email)
+        .count();
+
+      return usersWithSameEmail !== 0;
+    } catch (err) {
+      console.log("Could not check if email belongs to existing user: ", err);
+    }
+  }
+
+  private async usernameBelongsToExistingUser(username: string) {
+    try {
+      const usersWithSameUsername = await this.g
+        .V()
+        .has("user", "username", username)
+        .count();
+
+      return usersWithSameUsername !== 0;
+    } catch (err) {
+      console.log(
+        "Could not check if username belongs to existing user: ",
+        err
+      );
+    }
+  }
+
+  public async register(
+    email: string,
+    firstName: string,
+    lastName: string,
+    username: string,
+    password: string,
+    dateOfBirth: string
+  ) {
+    if (this.emailBelongsToExistingUser(email)) {
+      throw new Error(
+        "The provided email address has already been used to register for another account"
+      );
+    }
+    if (this.usernameBelongsToExistingUser(username)) {
+      throw new Error(
+        "The provided username has already been used to register for another account"
+      );
+    }
+
+    try {
+      const encryptedPassword = this.hashPassword(password);
+      const userId = uuid();
+      console.log(
+        this.g
+          .addV("user")
+          .property("userId", userId)
+          .property("email", email)
+          .property("firstName", firstName)
+          .property("lastName", lastName)
+          .property("username", username)
+          .property("password", encryptedPassword)
+          .property("dateOfBirth", dateOfBirth)
+          .property("dateCreated", Date.now().toString())
+          .property("accountType", AccountType.Free)
+          .next()
+      );
+
+      console.log("Finished adding to the graph");
+      console.log("Searching graph for newly created node...");
+      console.log(this.g.V().has("user", "userId", userId).values("username"));
+      console.log("Done searching");
+
+      const token =
+        confirmUserPrefix +
+        jwt.sign({ userId }, JWT_SECRET, { expiresIn: "1h" });
+
+      console.log(`Generated token: ${token}`);
+    } catch (err) {
+      console.log("Could not register new user", err);
+    }
   }
 
   /*

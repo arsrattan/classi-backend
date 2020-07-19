@@ -76,7 +76,23 @@ export class UserResolver {
 
   @Mutation((returns) => Boolean)
   async registerUser(@Arg("data", { nullable: true }) data: CreateUserInput) {
-    return await this.userController.registerUser(data);
+    const {
+      username,
+      password,
+      email,
+      dateOfBirth,
+      firstName,
+      lastName,
+    } = data;
+    return await this.userController.register(
+      email,
+      firstName,
+      lastName,
+      username,
+      password,
+      dateOfBirth
+    );
+    // return await this.userController.registerUser(data);
   }
 
   // @UseMiddleware(isCorrectUserFromConfirmation)

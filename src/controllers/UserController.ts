@@ -67,7 +67,7 @@ class UserController {
   private async emailBelongsToExistingUser(email: string) {
     try {
       const usersWithSameEmail = Number(
-        await this.g.V().hasLabel("user").has("email", email).count().next()
+        (await this.g.V().hasLabel("user").has("email", email).count().next())
           .value
       );
 
@@ -82,8 +82,14 @@ class UserController {
   private async usernameBelongsToExistingUser(username: string) {
     try {
       const usersWithSameUsername = Number(
-        await this.g.V().hasLabel("user").has("email", username).count().next()
-          .value
+        (
+          await this.g
+            .V()
+            .hasLabel("user")
+            .has("email", username)
+            .count()
+            .next()
+        ).value
       );
 
       console.log(

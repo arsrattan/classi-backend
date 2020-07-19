@@ -111,7 +111,7 @@ class UserController {
     password: string,
     dateOfBirth: string
   ) {
-    console.log(`Vertices: ${JSON.stringify(await this.g.V())}`);
+    console.log(`Vertices: ${await this.g.V()}`);
     console.log(`The graph currently has ${await this.g.V().count()} vertices`);
 
     if (this.emailBelongsToExistingUser(email)) {

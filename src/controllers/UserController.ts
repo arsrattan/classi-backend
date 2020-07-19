@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt-nodejs";
+import bcrypt from "bcrypt";
 import uniqid from "uniqid";
 import * as jwt from "jsonwebtoken";
 import { User } from "../entities/User";
@@ -17,7 +17,6 @@ import { Notification } from "../entities/Notification";
 import AccountType from "../enums/AccountType";
 import gremlin from "gremlin";
 import { uuid } from "uuidv4";
-import argon from "argon2";
 
 const DriverRemoteConnection = gremlin.driver.DriverRemoteConnection;
 const Graph = gremlin.structure.Graph;
@@ -119,8 +118,17 @@ class UserController {
       );
     }
 
+    let encryptedPassword;
+    await bcrypt.hash(password, 10, (err, hash) => {
+      if (err) {
+        throw new Error(`Could not hash password: ${err.message}`);
+      }
+      encryptedPassword = hash;
+    });
+
+    console.log(`Encrypted password: ${encryptedPassword}`);
+
     try {
-      const encryptedPassword = await argon.hash(password);
       const userId = uuid();
       await this.g
         .addV("user")

@@ -113,12 +113,12 @@ class UserController {
     password: string,
     dateOfBirth: string
   ) {
-    if (this.emailBelongsToExistingUser(email)) {
+    if ((await this.emailBelongsToExistingUser(email)) === true) {
       throw new Error(
         "The provided email address has already been used to register for another account"
       );
     }
-    if (this.usernameBelongsToExistingUser(username)) {
+    if ((await this.usernameBelongsToExistingUser(username)) === true) {
       throw new Error(
         "The provided username has already been used to register for another account"
       );

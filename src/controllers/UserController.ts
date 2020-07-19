@@ -17,6 +17,7 @@ import { Notification } from "../entities/Notification";
 import AccountType from "../enums/AccountType";
 import gremlin from "gremlin";
 import { uuid } from "uuidv4";
+import argon from "argon2";
 
 const DriverRemoteConnection = gremlin.driver.DriverRemoteConnection;
 const Graph = gremlin.structure.Graph;
@@ -71,8 +72,6 @@ class UserController {
           .value
       );
 
-      console.log(`Found ${usersWithSameEmail} users with the same email`);
-
       return usersWithSameEmail !== 0;
     } catch (err) {
       console.log("Could not check if email belongs to existing user: ", err);
@@ -90,10 +89,6 @@ class UserController {
             .count()
             .next()
         ).value
-      );
-
-      console.log(
-        `Found ${usersWithSameUsername} users with the same username`
       );
 
       return usersWithSameUsername !== 0;
@@ -125,34 +120,20 @@ class UserController {
     }
 
     try {
-      const encryptedPassword = this.hashPassword(password);
+      const encryptedPassword = await argon.hash(password);
       const userId = uuid();
-      console.log(
-        await this.g
-          .addV("user")
-          .property("userId", userId)
-          .property("email", email)
-          .property("firstName", firstName)
-          .property("lastName", lastName)
-          .property("username", username)
-          .property("password", encryptedPassword)
-          .property("dateOfBirth", dateOfBirth)
-          .property("dateCreated", Date.now().toString())
-          .property("accountType", AccountType.Free)
-          .next()
-      );
-
-      console.log("Finished adding to the graph");
-      console.log("Searching graph for newly created node...");
-      console.log(
-        await this.g
-          .V()
-          .hasLabel("user")
-          .has("userId", userId)
-          .values("username")
-          .toList()
-      );
-      console.log("Done searching");
+      await this.g
+        .addV("user")
+        .property("userId", userId)
+        .property("email", email)
+        .property("firstName", firstName)
+        .property("lastName", lastName)
+        .property("username", username)
+        .property("password", encryptedPassword)
+        .property("dateOfBirth", dateOfBirth)
+        .property("dateCreated", Date.now().toString())
+        .property("accountType", AccountType.Free)
+        .next();
 
       const token =
         confirmUserPrefix +

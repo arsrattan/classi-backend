@@ -68,8 +68,10 @@ class UserController {
     try {
       const usersWithSameEmail = await this.g
         .V()
-        .has("user", "email", email)
-        .count();
+        .hasLabel("user")
+        .has("email", email)
+        .values("userId")
+        .toList();
 
       console.log(`Found ${usersWithSameEmail} users with the same email`);
 
@@ -83,9 +85,10 @@ class UserController {
     try {
       const usersWithSameUsername = await this.g
         .V()
-        .has("user", "username", username)
+        .hasLabel("user")
+        .has("username", username)
         .values("userId")
-        .asList();
+        .toList();
 
       console.log(
         `Found ${usersWithSameUsername} users with the same username`
@@ -108,7 +111,8 @@ class UserController {
     password: string,
     dateOfBirth: string
   ) {
-    console.log(`The graph currently has ${this.g.V().count()} vertices`);
+    console.log(`Vertices: ${JSON.stringify(await this.g.V())}`);
+    console.log(`The graph currently has ${await this.g.V().count()} vertices`);
 
     if (this.emailBelongsToExistingUser(email)) {
       throw new Error(

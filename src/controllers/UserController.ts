@@ -71,6 +71,8 @@ class UserController {
         .has("user", "email", email)
         .count();
 
+      console.log(`Found ${usersWithSameEmail} users with the same email`);
+
       return usersWithSameEmail !== 0;
     } catch (err) {
       console.log("Could not check if email belongs to existing user: ", err);
@@ -83,6 +85,10 @@ class UserController {
         .V()
         .has("user", "username", username)
         .count();
+
+      console.log(
+        `Found ${usersWithSameUsername} users with the same username`
+      );
 
       return usersWithSameUsername !== 0;
     } catch (err) {

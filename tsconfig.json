@@ -1,26 +1,25 @@
 {
-    "compilerOptions": {
-        "noImplicitAny": false,
-        "removeComments": true,
-        "preserveConstEnums": true,
-        "sourceMap": true,
-        "esModuleInterop": true,
-        "target": "es2018",
-        "module": "commonjs",
-        "lib": ["es2018", "esnext.asynciterable"],
-        "types": ["reflect-metadata"],
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true
-    },
-    "include": [
-        "src/**/*"
-    ],
-    "exclude": [
-        "node_modules/**/*",
-        ".serverless/**/*",
-        ".webpack/**/*",
-        "_warmup/**/*",
-        "**/*.spec.ts",
-        ".vscode/**/*"
-    ]
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "target": "es2018",
+    "module": "commonjs",
+    "lib": ["es2018", "esnext.asynciterable"],
+    "types": ["reflect-metadata"],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "outDir": "./built"
+  },
+  "include": ["src/**/*"],
+  "exclude": [
+    "node_modules/**/*",
+    ".serverless/**/*",
+    ".webpack/**/*",
+    "_warmup/**/*",
+    "**/*.spec.ts",
+    ".vscode/**/*"
+  ]
 }

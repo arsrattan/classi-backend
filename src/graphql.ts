@@ -1,37 +1,52 @@
 import "reflect-metadata";
-import "source-map-support/register"
-import {buildSchemaSync} from "type-graphql";
-import {ApolloServer} from "apollo-server-lambda";
-import {UserResolver} from "./resolvers/UserResolver";
-import {ClassResolver} from "./resolvers/ClassResolver";
-import {PostResolver} from "./resolvers/PostResolver";
+import "source-map-support/register";
+import { buildSchemaSync } from "type-graphql";
+// import { ApolloServer } from "apollo-server-lambda";
+import { ApolloServer } from "apollo-server";
+import { UserResolver } from "./resolvers/UserResolver";
+import { ClassResolver } from "./resolvers/ClassResolver";
+import { PostResolver } from "./resolvers/PostResolver";
+import { userAuthChecker } from "./auth/isAuth";
 
-
-const schema = buildSchemaSync({
+void (async function bootstrap() {
+  const schema = buildSchemaSync({
     resolvers: [UserResolver, ClassResolver, PostResolver],
     validate: false,
-    //authMode: "null",
-});
+    authChecker: userAuthChecker,
+  });
 
-const graphQlServer = new ApolloServer({
+  const server = new ApolloServer({
     schema,
-    context: ({ event, context }) => ({
-        headers: event.headers,
-        functionName: context.functionName,
-        event,
-        context,
+    context: () => ({
+      authToken: "Bearer test",
     }),
-    playground: true,
-    introspection: true,
+  });
+
+  // Start the server
+  const { url } = await server.listen(4000);
+  console.log(`Server is running, GraphQL Playground available at ${url}`);
+
+  /*
+const graphQlServer = new ApolloServer({
+  schema,
+  context: ({ event, context }) => ({
+    headers: event.headers,
+    functionName: context.functionName,
+    event,
+    context,
+  }),
+  playground: true,
+  introspection: true,
 });
 
 export function graphqlHandler(event, context, cb) {
-    context.callbackWaitsForEmptyEventLoop = false;
-    return graphQlServer.createHandler({
-        cors: {
-            origin: '*',
-            credentials: true,
-        },
-    })(event, context, cb);
-};
-
+  context.callbackWaitsForEmptyEventLoop = false;
+  return graphQlServer.createHandler({
+    cors: {
+      origin: "*",
+      credentials: true,
+    },
+  })(event, context, cb);
+}
+*/
+})();

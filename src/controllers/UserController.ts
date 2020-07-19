@@ -128,7 +128,7 @@ class UserController {
       const encryptedPassword = this.hashPassword(password);
       const userId = uuid();
       console.log(
-        this.g
+        await this.g
           .addV("user")
           .property("userId", userId)
           .property("email", email)
@@ -145,7 +145,12 @@ class UserController {
       console.log("Finished adding to the graph");
       console.log("Searching graph for newly created node...");
       console.log(
-        await this.g.V().has("user", "userId", userId).values("username").next()
+        await this.g
+          .V()
+          .hasLabel("user")
+          .has("userId", userId)
+          .values("username")
+          .toList()
       );
       console.log("Done searching");
 

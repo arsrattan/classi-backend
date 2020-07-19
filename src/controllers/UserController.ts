@@ -84,6 +84,7 @@ class UserController {
       const usersWithSameUsername = await this.g
         .V()
         .has("user", "username", username)
+        .values("userId")
         .count();
 
       console.log(
@@ -107,6 +108,8 @@ class UserController {
     password: string,
     dateOfBirth: string
   ) {
+    console.log(`The graph currently has ${this.g.V().count} vertices`);
+
     if (this.emailBelongsToExistingUser(email)) {
       throw new Error(
         "The provided email address has already been used to register for another account"

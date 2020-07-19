@@ -66,12 +66,10 @@ class UserController {
 
   private async emailBelongsToExistingUser(email: string) {
     try {
-      const usersWithSameEmail = await this.g
-        .V()
-        .hasLabel("user")
-        .has("email", email)
-        .values("userId")
-        .toList();
+      const usersWithSameEmail = Number(
+        await this.g.V().hasLabel("user").has("email", email).count().next()
+          .value
+      );
 
       console.log(`Found ${usersWithSameEmail} users with the same email`);
 
@@ -83,12 +81,10 @@ class UserController {
 
   private async usernameBelongsToExistingUser(username: string) {
     try {
-      const usersWithSameUsername = await this.g
-        .V()
-        .hasLabel("user")
-        .has("username", username)
-        .values("userId")
-        .toList();
+      const usersWithSameUsername = Number(
+        await this.g.V().hasLabel("user").has("email", username).count().next()
+          .value
+      );
 
       console.log(
         `Found ${usersWithSameUsername} users with the same username`
@@ -111,9 +107,6 @@ class UserController {
     password: string,
     dateOfBirth: string
   ) {
-    console.log(`Vertices: ${await this.g.V()}`);
-    console.log(`The graph currently has ${await this.g.V().count()} vertices`);
-
     if (this.emailBelongsToExistingUser(email)) {
       throw new Error(
         "The provided email address has already been used to register for another account"
@@ -145,7 +138,9 @@ class UserController {
 
       console.log("Finished adding to the graph");
       console.log("Searching graph for newly created node...");
-      console.log(this.g.V().has("user", "userId", userId).values("username"));
+      console.log(
+        await this.g.V().has("user", "userId", userId).values("username").next()
+      );
       console.log("Done searching");
 
       const token =

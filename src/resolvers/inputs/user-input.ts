@@ -25,17 +25,17 @@ export class UserInput implements Partial<User> {
     @Field({nullable: true})
     s3url: string;
     @Field(_type => GraphQLJSONObject, {nullable: true})
-    userGroups: string[];
+    userGroups: [string];
 }
 
 @InputType()
 export class CreateUserInput implements Partial<User> {
     @Field()
     userId: string;
-    @Field()
+    @Field({nullable: true})
     @IsEmail()
     email: string;
-    @Field()
+    @Field({nullable: true})
     password: string;
     @Field()
     firstName: string;
@@ -44,5 +44,7 @@ export class CreateUserInput implements Partial<User> {
     @Field({nullable: true})
     s3url: string;
     @Field(_type => GraphQLJSONObject, {nullable: true})
-    userGroups: string[];
+    userGroups: [string];
+    @Field({nullable: true})
+    fbOrIgLogin: boolean;
 }

@@ -1,15 +1,12 @@
-import { Request, Response } from "express";
 import uniqid from 'uniqid';
 import Group from "../entities/Group";
 // import {Registration} from "../entities/Registration";
 import { createDocumentClient } from "../lib/AWS";
-import UserController from "./UserController";
 
 const groupTable = "classi-workout-groups" // move to config file later
 
 class GroupController {
     private docClient = createDocumentClient("Group");
-    private userController = new UserController();
     
     // get workoutGroups by id
     public async getWorkoutGroupById(groupId): Promise<Group[]> {

@@ -12,14 +12,12 @@ import {JWT_SECRET} from "../util/secrets";
 import NotificationType from "../enums/NotificationType";
 import {Notification} from "../entities/Notification";
 import Group from "../entities/Group";
-import GroupController from "../controllers/GroupController";
 import AccountType from "../enums/AccountType";
 
 class UserController{
     private user: string = process.env.NEO4J_USER;
     private password: string = process.env.NEO4J_PASSWORD;
     private host: string = process.env.NEO4J_IP;
-    private groupContorller: GroupController = new GroupController();
 
     public driver: Driver = neo4j.v1.driver(
         "bolt://" + this.host,
@@ -38,27 +36,46 @@ class UserController{
         });
     }
 
-    public async login(email: string, password: string): Promise<AuthData> {
-        return this.session.run('MATCH (n { email: \'' + email + '\' }) RETURN n')
-            .then(result => {
-                if(result.records.length == 0) throw new Error('User does not exist!');
-                let user = result.records[0]["_fields"][0]['properties'];
-                const isEqual = bcrypt.compareSync(password, user.password);
-                if(!isEqual) {
-                    throw new Error('Incorrect password!');
-                }
-                // else if(!user.confirmed){
-                //     throw new Error('Please confirm your email.');
-                // }
-                else {
-                    const token = jwt.sign({userId: user.userId, email: user.email}, JWT_SECRET,{expiresIn: '1h'});
-                    return { accessToken: token, userId: user.userId, expirationInHours: 1 }
-                }
-            })
-            .catch(error => {
-                console.log(error);
-                return error;
+    public async login(userId: string, password: string): Promise<AuthData> {
+        const gremlin = require('gremlin');
+        const traversal = gremlin.process.AnonymousTraversalSource.traversal;
+        const DriverRemoteConnection = gremlin.driver.DriverRemoteConnection;
+        const g = traversal().withRemote(new DriverRemoteConnection(
+            'wss://neptunedbinstance-cti8rfcktrww.cjqgcta10amy.us-east-1.neptune.amazonaws.com:8182/gremlin', {})
+        );
+
+        return g.V().toList().
+            then(data => {
+                console.log(data);
+                return null;
+            }).catch(error => {
+                console.log('ERROR', error);
             });
+        
+        // return this.session.run('MATCH (n { userId: \'' + userId + '\' }) RETURN n')
+        //     .then(result => {
+        //         if(result.records.length == 0) throw new Error('User does not exist!');
+        //         let user = result.records[0]["_fields"][0]['properties'];
+        //         if(password == null){
+        //             const token = jwt.sign({userId: user.userId, firstName: user.firstName}, JWT_SECRET,{expiresIn: '1h'});
+        //             return { accessToken: token, userId: user.userId, expirationInHours: 1 }
+        //         }
+        //         const isEqual = bcrypt.compareSync(password, user.password);
+        //         if(!isEqual) {
+        //             throw new Error('Incorrect password!');
+        //         }
+        //         // else if(!user.confirmed){
+        //         //     throw new Error('Please confirm your email.');
+        //         // }
+        //         else {
+        //             const token = jwt.sign({userId: user.userId, firstName: user.firstName}, JWT_SECRET,{expiresIn: '1h'});
+        //             return { accessToken: token, userId: user.userId, expirationInHours: 1 }
+        //         }
+        //     })
+        //     .catch(error => {
+        //         console.log(error);
+        //         return error;
+        //     });
     }
 
     public async confirmUser(token: string): Promise<Boolean> {
@@ -139,37 +156,37 @@ class UserController{
     }
 
     public async registerUser(data: any): Promise<Boolean> {
-        await this.getUserById(data['userId'], data['email']).then(users => {
-            if(users.length >= 1){
-                throw new Error('Username or email already exists!');
-            }
-        });
+        const gremlin = require('gremlin');
+        const traversal = gremlin.process.AnonymousTraversalSource.traversal;
+        const DriverRemoteConnection = gremlin.driver.DriverRemoteConnection;
+        const g = traversal().withRemote(new DriverRemoteConnection(
+            'wss://neptunedbinstance-cti8rfcktrww.cjqgcta10amy.us-east-1.neptune.amazonaws.com:8182/gremlin', {})
+        );
+        // await this.getUserById(data['userId']).then(users => {
+        //     if(users.length >= 1){
+        //         throw new Error('Username or email already exists!');
+        //     }
+        // });
         data['createdAt'] = Date.now();
         data['accountType'] = AccountType.Free;
         const hash = await(this.hashPassword(data['password']));
-        let cypher = "CREATE (n:User { "
         const keys = Object.keys(data)
         for(let i = 0; i < keys.length; i++){
             if(keys[i] == 'password'){
-                cypher += keys[i] + ": \'" + hash + "\'";
+                g.addV("person").property('password', hash);
             }
             else {
-                cypher += keys[i] + ": \'" + data[keys[i]] + "\'";
+                g.addV("person").property(keys[i], data[keys[i]]);
             }
-            if(!(i == keys.length - 1)) cypher += ",";
         }
-        cypher += "})";
-        return this.session.run(cypher)
-            .then(() => {
-                const token = confirmUserPrefix
-                    + jwt.sign({userId: data['userId']}, JWT_SECRET,{expiresIn: '1h'});
-                const url = `http://localhost:3000/user/confirm/${token}`
-                sendEmail(data['email'], url);
-                return true;
-            })
-            .catch(error => {
-                throw new Error(error);
-            });
+        return g.V().next().then(() => {
+            //const token = confirmUserPrefix + jwt.sign({userId: data['userId']}, JWT_SECRET,{expiresIn: '1h'});
+            //const url = `http://localhost:3000/user/confirm/${token}`
+            //sendEmail(data['email'], url);
+            return true;
+        }).catch(error => {
+            throw new Error(error);
+        });
     }
 
     public async forgotPassword(email: string): Promise<Boolean> {
@@ -191,15 +208,17 @@ class UserController{
     }
 
     public async getAllUsers(): Promise<User[]> {
-        let users: any = [];
-        return this.session.run('MATCH (n:User) RETURN n')
-            .then(result => {
-                result.records.forEach(record => {
-                    users.push(record.toObject()["n"]["properties"]);
-                })
-                return users;
-            })
-            .catch(error => {
+        const gremlin = require('gremlin');
+        const traversal = gremlin.process.AnonymousTraversalSource.traversal;
+        const DriverRemoteConnection = gremlin.driver.DriverRemoteConnection;
+        const g = traversal().withRemote(new DriverRemoteConnection(
+            'wss://neptunedbinstance-cti8rfcktrww.cjqgcta10amy.us-east-1.neptune.amazonaws.com:8182/gremlin', {})
+        );
+        return g.V().toList().
+            then(data => {
+                console.log(data);
+                return data;
+            }).catch(error => {
                 throw new Error(error);
             });
     }
@@ -326,9 +345,10 @@ class UserController{
 
     // returns the all of the user's Groups 
     public async getUserGroupsById(userId: string): Promise<Group[]> {
-        const user = await this.getUserById(userId);
-        const groups: string[] = user[0].userGroups;
-        return this.groupContorller.batchGetWorkoutGroupByIds(groups);
+        // const user = await this.getUserById(userId);
+        // const groups: string[] = user[0].userGroups;
+        // return this.groupContorller.batchGetWorkoutGroupByIds(groups);
+        return null;
     }
 
     // adds a group to the user's groups list

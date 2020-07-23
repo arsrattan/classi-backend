@@ -156,7 +156,7 @@ class ClassController{
         });
     }
 
-    public async registerForClass(userId: string, classId: string, scheduledTime: number): Promise<Boolean> {
+    public async registerForClass(userId: string[], classId: string, scheduledTime: number): Promise<Boolean> {
         let data = {};
         data['scheduledTime'] = scheduledTime
         data['createdAt'] = Date.now();

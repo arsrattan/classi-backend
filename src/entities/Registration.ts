@@ -1,7 +1,7 @@
 import {Field, ID, ObjectType} from "type-graphql";
 
 @ObjectType("Registration")
-export default class Registration {
+export class Registration {
     @Field()
     registrationId: string;
 

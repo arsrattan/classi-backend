@@ -1,7 +1,7 @@
 import {Arg, Mutation, Query, Resolver, UseMiddleware} from "type-graphql";
 import {RegistrationInput} from "./inputs/registration-input";
 import RegistrationController from "../controllers/RegistrationController";
-import Registration from "../entities/Registration";
+import {Registration} from "../entities/Registration";
 import {isAuth, isCorrectUser} from "../auth/isAuth";
 
 @Resolver()

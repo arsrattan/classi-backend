@@ -1,6 +1,6 @@
 import {InputType, Field} from "type-graphql";
 import Group from "../../entities/Group";
-import Registration from "../../entities/Registration";
+import {Registration} from "../../entities/Registration";
 import { GraphQLJSONObject } from "graphql-type-json";
 
 @InputType()

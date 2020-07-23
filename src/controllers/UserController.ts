@@ -11,14 +11,26 @@ import {
 import { getDecodedToken } from "../auth/isAuth";
 import { JWT_SECRET } from "../util/secrets";
 import NotificationType from "../enums/NotificationType";
+<<<<<<< Updated upstream
 import { Notification } from "../entities/Notification";
+=======
+import {Notification} from "../entities/Notification";
+import Group from "../entities/Group";
+>>>>>>> Stashed changes
 import AccountType from "../enums/AccountType";
 import gremlin from "gremlin";
 import { uuid } from "uuidv4";
 
+<<<<<<< Updated upstream
 const DriverRemoteConnection = gremlin.driver.DriverRemoteConnection;
 const Graph = gremlin.structure.Graph;
 const graph = new Graph();
+=======
+class UserController{
+    private user: string = process.env.NEO4J_USER;
+    private password: string = process.env.NEO4J_PASSWORD;
+    private host: string = process.env.NEO4J_IP;
+>>>>>>> Stashed changes
 
 class UserController {
   private g = graph
@@ -41,6 +53,7 @@ class UserController {
     });
   }
 
+<<<<<<< Updated upstream
   public async login(username: string, password: string): Promise<AuthData> {
     const data = await this.g.V().limit(1).count().next();
     console.log(`Data: ${data}`);
@@ -50,6 +63,49 @@ class UserController {
       expirationInHours: 1,
     };
   }
+=======
+    public async login(userId: string, password: string): Promise<AuthData> {
+        const gremlin = require('gremlin');
+        const traversal = gremlin.process.AnonymousTraversalSource.traversal;
+        const DriverRemoteConnection = gremlin.driver.DriverRemoteConnection;
+        const g = traversal().withRemote(new DriverRemoteConnection(
+            'wss://neptunedbinstance-cti8rfcktrww.cjqgcta10amy.us-east-1.neptune.amazonaws.com:8182/gremlin', {})
+        );
+
+        return g.V().toList().
+            then(data => {
+                console.log(data);
+                return null;
+            }).catch(error => {
+                console.log('ERROR', error);
+            });
+        
+        // return this.session.run('MATCH (n { userId: \'' + userId + '\' }) RETURN n')
+        //     .then(result => {
+        //         if(result.records.length == 0) throw new Error('User does not exist!');
+        //         let user = result.records[0]["_fields"][0]['properties'];
+        //         if(password == null){
+        //             const token = jwt.sign({userId: user.userId, firstName: user.firstName}, JWT_SECRET,{expiresIn: '1h'});
+        //             return { accessToken: token, userId: user.userId, expirationInHours: 1 }
+        //         }
+        //         const isEqual = bcrypt.compareSync(password, user.password);
+        //         if(!isEqual) {
+        //             throw new Error('Incorrect password!');
+        //         }
+        //         // else if(!user.confirmed){
+        //         //     throw new Error('Please confirm your email.');
+        //         // }
+        //         else {
+        //             const token = jwt.sign({userId: user.userId, firstName: user.firstName}, JWT_SECRET,{expiresIn: '1h'});
+        //             return { accessToken: token, userId: user.userId, expirationInHours: 1 }
+        //         }
+        //     })
+        //     .catch(error => {
+        //         console.log(error);
+        //         return error;
+        //     });
+    }
+>>>>>>> Stashed changes
 
   private async emailBelongsToExistingUser(email: string) {
     try {
@@ -86,6 +142,7 @@ class UserController {
     }
   }
 
+<<<<<<< Updated upstream
   public async register(
     email: string,
     firstName: string,
@@ -98,6 +155,40 @@ class UserController {
       throw new Error(
         "The provided email address has already been used to register for another account"
       );
+=======
+    public async registerUser(data: any): Promise<Boolean> {
+        const gremlin = require('gremlin');
+        const traversal = gremlin.process.AnonymousTraversalSource.traversal;
+        const DriverRemoteConnection = gremlin.driver.DriverRemoteConnection;
+        const g = traversal().withRemote(new DriverRemoteConnection(
+            'wss://neptunedbinstance-cti8rfcktrww.cjqgcta10amy.us-east-1.neptune.amazonaws.com:8182/gremlin', {})
+        );
+        // await this.getUserById(data['userId']).then(users => {
+        //     if(users.length >= 1){
+        //         throw new Error('Username or email already exists!');
+        //     }
+        // });
+        data['createdAt'] = Date.now();
+        data['accountType'] = AccountType.Free;
+        const hash = await(this.hashPassword(data['password']));
+        const keys = Object.keys(data)
+        for(let i = 0; i < keys.length; i++){
+            if(keys[i] == 'password'){
+                g.addV("person").property('password', hash);
+            }
+            else {
+                g.addV("person").property(keys[i], data[keys[i]]);
+            }
+        }
+        return g.V().next().then(() => {
+            //const token = confirmUserPrefix + jwt.sign({userId: data['userId']}, JWT_SECRET,{expiresIn: '1h'});
+            //const url = `http://localhost:3000/user/confirm/${token}`
+            //sendEmail(data['email'], url);
+            return true;
+        }).catch(error => {
+            throw new Error(error);
+        });
+>>>>>>> Stashed changes
     }
     if ((await this.usernameBelongsToExistingUser(username)) === true) {
       throw new Error(
@@ -105,6 +196,7 @@ class UserController {
       );
     }
 
+<<<<<<< Updated upstream
     let encryptedPassword;
     await bcrypt.hash(password, 10, (err, hash) => {
       if (err) {
@@ -137,6 +229,22 @@ class UserController {
       console.log(`Generated token: ${token}`);
     } catch (err) {
       console.log("Could not register new user", err);
+=======
+    public async getAllUsers(): Promise<User[]> {
+        const gremlin = require('gremlin');
+        const traversal = gremlin.process.AnonymousTraversalSource.traversal;
+        const DriverRemoteConnection = gremlin.driver.DriverRemoteConnection;
+        const g = traversal().withRemote(new DriverRemoteConnection(
+            'wss://neptunedbinstance-cti8rfcktrww.cjqgcta10amy.us-east-1.neptune.amazonaws.com:8182/gremlin', {})
+        );
+        return g.V().toList().
+            then(data => {
+                console.log(data);
+                return data;
+            }).catch(error => {
+                throw new Error(error);
+            });
+>>>>>>> Stashed changes
     }
   }
 
@@ -300,11 +408,20 @@ class UserController {
     return data;
   }
 
+<<<<<<< Updated upstream
   public async getUserById(userId: string, email?: string): Promise<User[]> {
     let data;
     try{
         data = await this. g.V().has('user','username', userId)
         console.log(data);
+=======
+    // returns the all of the user's Groups 
+    public async getUserGroupsById(userId: string): Promise<Group[]> {
+        // const user = await this.getUserById(userId);
+        // const groups: string[] = user[0].userGroups;
+        // return this.groupContorller.batchGetWorkoutGroupByIds(groups);
+        return null;
+>>>>>>> Stashed changes
     }
     catch(error) {
         throw new Error(error);

@@ -6,7 +6,8 @@
   "scripts": {
     "start": "npm run build && node built/graphql.js",
     "build": "tsc",
-    "deploy": "npm run build && serverless deploy"
+    "deploy": "npm run build && serverless deploy",
+    "offline": "npm run build && sls offline start"
   },
   "dependencies": {
     "@types/bcrypt-nodejs": "0.0.30",

@@ -7,6 +7,7 @@ import { Class } from "../../entities/Class";
 
 @InputType()
 export class UserInput implements Partial<User> {
+<<<<<<< Updated upstream
   @Field()
   userId: string;
   @Field({ nullable: true })
@@ -24,10 +25,32 @@ export class UserInput implements Partial<User> {
   accountType: AccountType;
   @Field({ nullable: true })
   s3url: string;
+=======
+    @Field()
+    userId: string;
+    @Field({ nullable: true })
+    @IsEmail()
+    email: string;
+    @Field({ nullable: true })
+    firstName: string;
+    @Field({ nullable: true })
+    lastName: string;
+    @Field({ nullable: true })
+    password: string;
+    @Field({ nullable: true })
+    biography: string;
+    @Field(type => AccountType, { nullable: true })
+    accountType: AccountType;
+    @Field({nullable: true})
+    s3url: string;
+    @Field(_type => GraphQLJSONObject, {nullable: true})
+    userGroups: [string];
+>>>>>>> Stashed changes
 }
 
 @InputType()
 export class CreateUserInput implements Partial<User> {
+<<<<<<< Updated upstream
   @Field()
   username: string;
   @Field()
@@ -44,3 +67,23 @@ export class CreateUserInput implements Partial<User> {
   @Field({ nullable: true })
   s3url: string;
 }
+=======
+    @Field()
+    userId: string;
+    @Field({nullable: true})
+    @IsEmail()
+    email: string;
+    @Field({nullable: true})
+    password: string;
+    @Field()
+    firstName: string;
+    @Field()
+    lastName: string;
+    @Field({nullable: true})
+    s3url: string;
+    @Field(_type => GraphQLJSONObject, {nullable: true})
+    userGroups: [string];
+    @Field({nullable: true})
+    fbOrIgLogin: boolean;
+}
+>>>>>>> Stashed changes

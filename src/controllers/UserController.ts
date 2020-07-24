@@ -336,7 +336,7 @@ class UserController {
     let data;
     let users: any = [];
     try{
-        data = await this.g.V().has('user','username', userId).out('follows').valueMap()
+        data = await this.g.V().has('user','username', userId).in_('follows').valueMap().toList();
         const res = JSON.parse(writer.write(data));
         for(let u of res['@value']){
             let user = {};
@@ -358,7 +358,7 @@ class UserController {
     let data;
     let users: any = [];
     try{
-        data = await this.g.V().has('user','username', userId).in_('follows').valueMap()
+        data = await this.g.V().has('user','username', userId).out('follows').valueMap().toList();
         const res = JSON.parse(writer.write(data));
         for(let u of res['@value']){
             let user = {};
@@ -394,17 +394,17 @@ class UserController {
   ): Promise<Boolean> {
     if (userId !== followedUser) {
         try{
-            if(isUnfollow){
+            if(!isUnfollow){
                 await this.g.V()
                 .has('user','username', userId)
                 .addE('follows')
-                .to(this.g.V().has('user','username', followedUser))
+                .to(this.g.V().has('user','username', followedUser)).next();
             }
             else {
                 await this.g.V()
                 .has('user','username', userId)
                 .outE('follows')
-                .where(this.g.V().has('user','username', followedUser)).drop()
+                .where(this.g.V().has('user','username', followedUser)).drop().next();
             }
             return true;
         }

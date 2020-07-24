@@ -28,17 +28,17 @@ export class UserResolver {
     return await this.userController.getAllUsers();
   }
 
-//   // @UseMiddleware(isAuth)
-//   @Query((returns) => [User], { nullable: true })
-//   async getUserFollowers(@Arg("userId") userId: string) {
-//     return await this.userController.getUserFollowers(userId);
-//   }
+  // @UseMiddleware(isAuth)
+  @Query((returns) => [User], { nullable: true })
+  async getUserFollowers(@Arg("userId") userId: string) {
+    return await this.userController.getUserFollowers(userId);
+  }
 
-//   // @UseMiddleware(isAuth)
-//   @Query((returns) => [User], { nullable: true })
-//   async getUserFollowing(@Arg("userId") userId: string) {
-//     return await this.userController.getUserFollowing(userId);
-//   }
+  // @UseMiddleware(isAuth)
+  @Query((returns) => [User], { nullable: true })
+  async getUserFollowing(@Arg("userId") userId: string) {
+    return await this.userController.getUserFollowing(userId);
+  }
 
 //   // @UseMiddleware(isCorrectUser)
 //   @Query((returns) => [Notification], { nullable: true })
@@ -46,11 +46,11 @@ export class UserResolver {
 //     return await this.userController.getUserNotifications(userId);
 //   }
 
-//   // @UseMiddleware(isAuth)
-//   @Query((returns) => Number, { nullable: true })
-//   async getNumFollowers(@Arg("userId") userId: string) {
-//     return await this.userController.getNumFollowers(userId);
-//   }
+  // @UseMiddleware(isAuth)
+  @Query((returns) => Number, { nullable: true })
+  async getNumFollowers(@Arg("userId") userId: string) {
+    return await this.userController.getNumFollowers(userId);
+  }
 
 //   @Mutation((returns) => AuthData)
 //   async login(
@@ -60,19 +60,19 @@ export class UserResolver {
 //     return await this.userController.login(username, password);
 //   }
 
-//   // @UseMiddleware(isCorrectUser)
-//   @Mutation((returns) => Boolean)
-//   async toggleFollow(
-//     @Arg("userId") userId: string,
-//     @Arg("followedUser") followedUser: string,
-//     @Arg("isUnfollow") isUnfollow: boolean
-//   ) {
-//     return await this.userController.toggleFollow(
-//       userId,
-//       followedUser,
-//       isUnfollow
-//     );
-//   }
+  // @UseMiddleware(isCorrectUser)
+  @Mutation((returns) => Boolean)
+  async toggleFollow(
+    @Arg("userId") userId: string,
+    @Arg("followedUser") followedUser: string,
+    @Arg("isUnfollow") isUnfollow: boolean
+  ) {
+    return await this.userController.toggleFollow(
+      userId,
+      followedUser,
+      isUnfollow
+    );
+  }
 
   @Mutation((returns) => Boolean)
   async registerUser(@Arg("data", { nullable: true }) data: CreateUserInput) {
@@ -124,9 +124,9 @@ export class UserResolver {
 //     return await this.userController.updateUser(userId, data);
 //   }
 
-//   // @UseMiddleware(isCorrectUser)
-//   @Mutation((returns) => Boolean)
-//   async deleteUserById(@Arg("userId") userId: string) {
-//     return await this.userController.deleteUserById(userId);
-//   }
+  // @UseMiddleware(isCorrectUser)
+  @Mutation((returns) => Boolean)
+  async deleteUserById(@Arg("userId") userId: string) {
+    return await this.userController.deleteUserById(userId);
+  }
 }

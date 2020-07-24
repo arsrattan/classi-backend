@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import uniqid from "uniqid";
 import * as jwt from "jsonwebtoken";
 import { User } from "../entities/User";
@@ -11,26 +11,22 @@ import {
 import { getDecodedToken } from "../auth/isAuth";
 import { JWT_SECRET } from "../util/secrets";
 import NotificationType from "../enums/NotificationType";
-<<<<<<< Updated upstream
 import { Notification } from "../entities/Notification";
-=======
-import {Notification} from "../entities/Notification";
-import Group from "../entities/Group";
->>>>>>> Stashed changes
 import AccountType from "../enums/AccountType";
-import gremlin from "gremlin";
+import {driver, process, structure} from "gremlin";
 import { uuid } from "uuidv4";
 
-<<<<<<< Updated upstream
-const DriverRemoteConnection = gremlin.driver.DriverRemoteConnection;
-const Graph = gremlin.structure.Graph;
+const {
+    DriverRemoteConnection,
+} = driver;
+
+const {
+  Graph,
+} = structure;
+
+const serializer = require('gremlin/lib/structure/io/graph-serializer');
+const writer = new serializer.GraphSON3Writer();
 const graph = new Graph();
-=======
-class UserController{
-    private user: string = process.env.NEO4J_USER;
-    private password: string = process.env.NEO4J_PASSWORD;
-    private host: string = process.env.NEO4J_IP;
->>>>>>> Stashed changes
 
 class UserController {
   private g = graph
@@ -53,7 +49,6 @@ class UserController {
     });
   }
 
-<<<<<<< Updated upstream
   public async login(username: string, password: string): Promise<AuthData> {
     const data = await this.g.V().limit(1).count().next();
     console.log(`Data: ${data}`);
@@ -63,49 +58,6 @@ class UserController {
       expirationInHours: 1,
     };
   }
-=======
-    public async login(userId: string, password: string): Promise<AuthData> {
-        const gremlin = require('gremlin');
-        const traversal = gremlin.process.AnonymousTraversalSource.traversal;
-        const DriverRemoteConnection = gremlin.driver.DriverRemoteConnection;
-        const g = traversal().withRemote(new DriverRemoteConnection(
-            'wss://neptunedbinstance-cti8rfcktrww.cjqgcta10amy.us-east-1.neptune.amazonaws.com:8182/gremlin', {})
-        );
-
-        return g.V().toList().
-            then(data => {
-                console.log(data);
-                return null;
-            }).catch(error => {
-                console.log('ERROR', error);
-            });
-        
-        // return this.session.run('MATCH (n { userId: \'' + userId + '\' }) RETURN n')
-        //     .then(result => {
-        //         if(result.records.length == 0) throw new Error('User does not exist!');
-        //         let user = result.records[0]["_fields"][0]['properties'];
-        //         if(password == null){
-        //             const token = jwt.sign({userId: user.userId, firstName: user.firstName}, JWT_SECRET,{expiresIn: '1h'});
-        //             return { accessToken: token, userId: user.userId, expirationInHours: 1 }
-        //         }
-        //         const isEqual = bcrypt.compareSync(password, user.password);
-        //         if(!isEqual) {
-        //             throw new Error('Incorrect password!');
-        //         }
-        //         // else if(!user.confirmed){
-        //         //     throw new Error('Please confirm your email.');
-        //         // }
-        //         else {
-        //             const token = jwt.sign({userId: user.userId, firstName: user.firstName}, JWT_SECRET,{expiresIn: '1h'});
-        //             return { accessToken: token, userId: user.userId, expirationInHours: 1 }
-        //         }
-        //     })
-        //     .catch(error => {
-        //         console.log(error);
-        //         return error;
-        //     });
-    }
->>>>>>> Stashed changes
 
   private async emailBelongsToExistingUser(email: string) {
     try {
@@ -142,8 +94,7 @@ class UserController {
     }
   }
 
-<<<<<<< Updated upstream
-  public async register(
+  public async registerUser(
     email: string,
     firstName: string,
     lastName: string,
@@ -155,40 +106,6 @@ class UserController {
       throw new Error(
         "The provided email address has already been used to register for another account"
       );
-=======
-    public async registerUser(data: any): Promise<Boolean> {
-        const gremlin = require('gremlin');
-        const traversal = gremlin.process.AnonymousTraversalSource.traversal;
-        const DriverRemoteConnection = gremlin.driver.DriverRemoteConnection;
-        const g = traversal().withRemote(new DriverRemoteConnection(
-            'wss://neptunedbinstance-cti8rfcktrww.cjqgcta10amy.us-east-1.neptune.amazonaws.com:8182/gremlin', {})
-        );
-        // await this.getUserById(data['userId']).then(users => {
-        //     if(users.length >= 1){
-        //         throw new Error('Username or email already exists!');
-        //     }
-        // });
-        data['createdAt'] = Date.now();
-        data['accountType'] = AccountType.Free;
-        const hash = await(this.hashPassword(data['password']));
-        const keys = Object.keys(data)
-        for(let i = 0; i < keys.length; i++){
-            if(keys[i] == 'password'){
-                g.addV("person").property('password', hash);
-            }
-            else {
-                g.addV("person").property(keys[i], data[keys[i]]);
-            }
-        }
-        return g.V().next().then(() => {
-            //const token = confirmUserPrefix + jwt.sign({userId: data['userId']}, JWT_SECRET,{expiresIn: '1h'});
-            //const url = `http://localhost:3000/user/confirm/${token}`
-            //sendEmail(data['email'], url);
-            return true;
-        }).catch(error => {
-            throw new Error(error);
-        });
->>>>>>> Stashed changes
     }
     if ((await this.usernameBelongsToExistingUser(username)) === true) {
       throw new Error(
@@ -196,7 +113,6 @@ class UserController {
       );
     }
 
-<<<<<<< Updated upstream
     let encryptedPassword;
     await bcrypt.hash(password, 10, (err, hash) => {
       if (err) {
@@ -229,22 +145,6 @@ class UserController {
       console.log(`Generated token: ${token}`);
     } catch (err) {
       console.log("Could not register new user", err);
-=======
-    public async getAllUsers(): Promise<User[]> {
-        const gremlin = require('gremlin');
-        const traversal = gremlin.process.AnonymousTraversalSource.traversal;
-        const DriverRemoteConnection = gremlin.driver.DriverRemoteConnection;
-        const g = traversal().withRemote(new DriverRemoteConnection(
-            'wss://neptunedbinstance-cti8rfcktrww.cjqgcta10amy.us-east-1.neptune.amazonaws.com:8182/gremlin', {})
-        );
-        return g.V().toList().
-            then(data => {
-                console.log(data);
-                return data;
-            }).catch(error => {
-                throw new Error(error);
-            });
->>>>>>> Stashed changes
     }
   }
 
@@ -301,33 +201,25 @@ class UserController {
 //       });
 //   }
 
-//   public async createUserNotification(data: any): Promise<Boolean> {
-//     data["createdAt"] = Date.now();
-//     data["notificationId"] = "notification" + uniqid();
-//     if (data["triggeringUserId"]) {
-//       const userData = await this.getUserById(data["triggeringUserId"]);
-//       data["triggeringUserS3Url"] = userData[0]["s3url"];
-//     }
-//     let cypher: string =
-//       'match(u:User) where u.userId="' +
-//       data["userId"] +
-//       '"' +
-//       " create (u)-[r:HAS_NOTIFICATION]->(n:Notification{";
-//     const keys = Object.keys(data);
-//     for (let i = 0; i < keys.length; i++) {
-//       cypher += keys[i] + ": '" + data[keys[i]] + "'";
-//       if (!(i == keys.length - 1)) cypher += ",";
-//     }
-//     cypher += "})";
-//     return this.session
-//       .run(cypher)
-//       .then(() => {
-//         return true;
-//       })
-//       .catch((error) => {
-//         throw new Error(error);
-//       });
-//   }
+  public async createUserNotification(data: any): Promise<Boolean> {
+    try {
+        const userData = await this.getUserById(data["triggeringUserId"]);
+        const notificationId = uuid();
+        await this.g
+          .addV("notification")
+          .property("notificationId", notificationId)
+          .property("triggeringUserId", data["triggeringUserId"])
+          .property("triggeringUserS3Url", userData[0]["s3url"])
+          .property("createdAt", Date.now().toString())
+          .property("accountType", AccountType.Free)
+          .next();
+  
+          return true;
+
+      } catch (err) {
+        throw new Error(err);
+      }
+  }
 
 //   public async getUserNotifications(userId: string): Promise<Notification[]> {
 //     let notifications: any = [];
@@ -398,129 +290,130 @@ class UserController {
 
   public async getAllUsers(): Promise<User[]> {
     let data;
+    let users = [];
     try{
-        data = await this. g.V().hasLabel('user');
-        console.log(data);
+        data = await this.g.V().hasLabel('user').valueMap().toList();
+        const res = JSON.parse(writer.write(data));
+        for(let u of res['@value']){
+            let user = {};
+            for(let i=0; i < u['@value'].length; i++){
+                if(typeof u['@value'][i] === 'string'){
+                    user[u['@value'][i]] = u['@value'][i + 1]['@value'][0]
+                }
+            }
+            users.push(user);
+        }
+        
     }
     catch(error) {
         throw new Error(error);
     }
-    return data;
+    return users;
   }
 
-<<<<<<< Updated upstream
-  public async getUserById(userId: string, email?: string): Promise<User[]> {
+  public async getUserById(username: string, email?: string): Promise<User> {
     let data;
+    let user: any = {};
     try{
-        data = await this. g.V().has('user','username', userId)
-        console.log(data);
-=======
-    // returns the all of the user's Groups 
-    public async getUserGroupsById(userId: string): Promise<Group[]> {
-        // const user = await this.getUserById(userId);
-        // const groups: string[] = user[0].userGroups;
-        // return this.groupContorller.batchGetWorkoutGroupByIds(groups);
-        return null;
->>>>>>> Stashed changes
+        data = await this. g.V().has('user','username', username).valueMap().toList();
+        const res = JSON.parse(writer.write(data));
+        console.log(res);
+        for(let u of res['@value']){
+            for(let i=0; i < u['@value'].length; i++){
+                if(typeof u['@value'][i] === 'string'){
+                    user[u['@value'][i]] = u['@value'][i + 1]['@value'][0]
+                }
+            }
+        }
     }
     catch(error) {
         throw new Error(error);
     }
-    return data;
+    return user;
   }
 
-//   public async getUserFollowers(userId: string): Promise<User[]> {
-//     let users: any = [];
-//     return this.session
-//       .run(
-//         "MATCH (a:User),(b:User) WHERE " +
-//           "b.userId = '" +
-//           userId +
-//           "' " +
-//           "MATCH (a)-[r:FOLLOWS]->(b) RETURN a"
-//       )
-//       .then((result) => {
-//         result.records.forEach((record) => {
-//           users.push(record.toObject()["a"]["properties"]);
-//         });
-//         return users;
-//       })
-//       .catch((error) => {
-//         throw new Error(error);
-//       });
-//   }
+  public async getUserFollowers(userId: string): Promise<User[]> {
+    let data;
+    let users: any = [];
+    try{
+        data = await this.g.V().has('user','username', userId).out('follows').valueMap()
+        const res = JSON.parse(writer.write(data));
+        for(let u of res['@value']){
+            let user = {};
+            for(let i=0; i < u['@value'].length; i++){
+                if(typeof u['@value'][i] === 'string'){
+                    user[u['@value'][i]] = u['@value'][i + 1]['@value'][0]
+                }
+            }
+            users.push(user);
+        }
+    }
+    catch(error) {
+        throw new Error(error);
+    }
+    return users;
+  }
 
-//   public async getUserFollowing(userId: string): Promise<User[]> {
-//     let users: any = [];
-//     return this.session
-//       .run(
-//         "MATCH (a:User),(b:User) WHERE " +
-//           "a.userId = '" +
-//           userId +
-//           "' " +
-//           "MATCH (a)-[r:FOLLOWS]->(b) RETURN b"
-//       )
-//       .then((result) => {
-//         result.records.forEach((record) => {
-//           users.push(record.toObject()["b"]["properties"]);
-//         });
-//         return users;
-//       })
-//       .catch((error) => {
-//         throw new Error(error);
-//       });
-//   }
+  public async getUserFollowing(userId: string): Promise<User[]> {
+    let data;
+    let users: any = [];
+    try{
+        data = await this.g.V().has('user','username', userId).in_('follows').valueMap()
+        const res = JSON.parse(writer.write(data));
+        for(let u of res['@value']){
+            let user = {};
+            for(let i=0; i < u['@value'].length; i++){
+                if(typeof u['@value'][i] === 'string'){
+                    user[u['@value'][i]] = u['@value'][i + 1]['@value'][0]
+                }
+            }
+            users.push(user);
+        }
+    }
+    catch(error) {
+        throw new Error(error);
+    }
+    return users;
+  }
 
-//   public async getNumFollowers(userId: string): Promise<number> {
-//     return this.session
-//       .run(
-//         "MATCH ()-[r:FOLLOWS]->(n) WHERE n.userId = '" +
-//           userId +
-//           "' RETURN COUNT(r)"
-//       )
-//       .then((result) => {
-//         return result.records[0].toObject()["COUNT(r)"]["low"];
-//       })
-//       .catch((error) => {
-//         throw new Error(error);
-//       });
-//   }
+  public async getNumFollowers(userId: string): Promise<number> {
+    let num;
+    try{
+        num = Number((await this.g.V().has('user','username', userId) .outE('follows').count().next()).value);
+        return num;
+    }
+    catch(error) {
+        throw new Error(error);
+    }
+  }
 
-//   public async toggleFollow(
-//     userId: string,
-//     followedUser: string,
-//     isUnfollow: boolean
-//   ): Promise<Boolean> {
-//     if (userId !== followedUser) {
-//       const cypher: string =
-//         "MATCH (u:User), (p:User) WHERE u.userId = " +
-//         '"' +
-//         userId +
-//         '" AND p.userId = "' +
-//         followedUser +
-//         '"' +
-//         " CREATE (u)-[:FOLLOWS]->(p) WITH u, p MATCH (u)-[r:FOLLOWS]->(p), (u)-[:FOLLOWS]->(p) DELETE r";
-//       return this.session
-//         .run(cypher)
-//         .then(() => {
-//           if (!isUnfollow) {
-//             try {
-//               this.createUserNotification({
-//                 userId: followedUser,
-//                 triggeringUserId: userId,
-//                 notificationType: NotificationType.New_Follower,
-//               });
-//             } catch (err) {
-//               throw new Error(err);
-//             }
-//           }
-//           return true;
-//         })
-//         .catch((error) => {
-//           throw new Error(error);
-//         });
-//     }
-//   }
+  public async toggleFollow(
+    userId: string,
+    followedUser: string,
+    isUnfollow: boolean
+  ): Promise<Boolean> {
+    if (userId !== followedUser) {
+        try{
+            if(isUnfollow){
+                await this.g.V()
+                .has('user','username', userId)
+                .addE('follows')
+                .to(this.g.V().has('user','username', followedUser))
+            }
+            else {
+                await this.g.V()
+                .has('user','username', userId)
+                .outE('follows')
+                .where(this.g.V().has('user','username', followedUser)).drop()
+            }
+            return true;
+        }
+        catch(error) {
+            throw new Error(error);
+        }
+        
+    }
+  }
 
 //   public async updateUser(userId: string, data: any): Promise<Boolean> {
 //     let cypher = "MERGE (n:User { userId: '" + userId + "' }) SET";

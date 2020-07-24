@@ -8,17 +8,9 @@ import {
 } from "type-graphql";
 import { Class } from "../entities/Class";
 import ClassController from "../controllers/ClassController";
-<<<<<<< Updated upstream
 import { CreateClassInput, UpdateClassInput } from "./inputs/class-input";
 import { isAuth, isCorrectUser, isCorrectUserFromJson } from "../auth/isAuth";
 import { CreateCommentInput } from "./inputs/comment-input";
-=======
-import {CreateClassInput, UpdateClassInput} from "./inputs/class-input";
-import {isAuth, isCorrectUser, isCorrectUserFromJson} from "../auth/isAuth";
-import {CreateCommentInput} from "./inputs/comment-input";
-import { GraphQLJSONObject } from 'graphql-type-json'
-
->>>>>>> Stashed changes
 
 @Resolver()
 export class ClassResolver {
@@ -107,7 +99,6 @@ export class ClassResolver {
     );
   }
 
-<<<<<<< Updated upstream
   // @UseMiddleware(isCorrectUser)
   @Mutation(() => Boolean)
   async deleteClassById(
@@ -116,22 +107,6 @@ export class ClassResolver {
   ) {
     return await this.classController.deleteClassById(classId, userId);
   }
-}
-=======
-    @UseMiddleware(isCorrectUser)
-    @Mutation(() => Boolean)
-    async registerForClass(@Arg("userId", type => GraphQLJSONObject) userId: [string],
-                    @Arg("classId") classId: string,
-                    @Arg("scheduledTime") scheduledTime: number) {
-        return await this.classController.registerForClass(userId, classId, scheduledTime);
-    };
 
-    @UseMiddleware(isCorrectUser)
-    @Mutation(() => Boolean)
-    async deleteClassById(@Arg("classId") classId: string,
-                          @Arg("userId") userId: string) {
-        return await this.classController.deleteClassById(classId, userId);
-    }
 
 }
->>>>>>> Stashed changes

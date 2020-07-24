@@ -43,7 +43,7 @@ export async function uploadFileToS3(data: any, picture: Upload, tableName: stri
   return data;
 }
 
-export function createDocumentClient(model: "Class" | "Post" | "Registration"): AWS.DynamoDB.DocumentClient {
+export function createDocumentClient(model: "Class" | "Post" | "Registration" | "Group"): AWS.DynamoDB.DocumentClient {
   if (!isLocal) {
     return new AWS.DynamoDB.DocumentClient({
       region: "us-east-1",

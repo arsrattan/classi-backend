@@ -8,10 +8,11 @@ export class UserRoutes {
     this.router = Router();
     this.routes();
   }
+  //
   routes() {
     // this.router.get("/", this.userController.listAllUsers);
     // this.router.get("/:userId", this.userController.getUserById);
-    this.router.post("/register", this.userController.registerUser);
+    // this.router.post("/register", this.userController.registerUser);
     // this.router.post("/login", this.userController.authenticateUser);
   }
 }

@@ -12,7 +12,7 @@ export class User {
   @Field()
   email: string;
   @Field({ nullable: true })
-  imageKey?: string;
+  imageKey: string;
   @Field()
   firstName: string;
   @Field()
@@ -31,4 +31,8 @@ export class User {
   notifications: Notification[];
   @Field()
   confirmed: boolean;
+  @Field({nullable: true})
+  fbOrIgLogin: boolean;
+  @Field(_type => GraphQLJSONObject, {nullable: true})
+  userGroups: [string] // array of groupIds a user is a part of
 }

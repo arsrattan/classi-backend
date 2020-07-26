@@ -185,29 +185,23 @@ class ClassController {
       });
   }
 
-  public async registerForClass(
-    userId: string,
-    classId: string,
-    scheduledTime: number
-  ): Promise<Boolean> {
-    let data = {};
-    data["scheduledTime"] = scheduledTime;
-    data["createdAt"] = Date.now();
-    data["userId"] = userId;
-    data["classId"] = classId;
-    data["invitedRegistrations"] = [];
-    data["registrationId"] = "registration" + uniqid();
-    const params = {
-      TableName: "registrationsTable",
-      Item: data,
-    };
-    const promise = this.docClient.put(params).promise();
-    return promise
-      .then(() => true)
-      .catch((err) => {
-        throw new Error(err);
-      });
-  }
+    public async registerForClass(userId: string[], classId: string, scheduledTime: number): Promise<Boolean> {
+        let data = {};
+        data['scheduledTime'] = scheduledTime
+        data['createdAt'] = Date.now();
+        data['userId'] = userId;
+        data['classId'] = classId;
+        data['invitedRegistrations'] = [];
+        data['registrationId'] = "registration" + uniqid();
+        const params = {
+            TableName: "registrationsTable",
+            Item: data
+        };
+        const promise = this.docClient.put(params).promise();
+        return promise.then(() => true).catch(err => {
+            throw new Error(err);
+        });
+    }
 }
 
 export default ClassController;

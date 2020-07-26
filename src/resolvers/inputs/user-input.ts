@@ -30,6 +30,8 @@ export class UserInput implements Partial<User> {
 @InputType()
 export class CreateUserInput implements Partial<User> {
     @Field()
+    userId: string;
+    @Field()
     username: string;
     @Field()
     dateOfBirth: string;

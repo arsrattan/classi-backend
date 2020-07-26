@@ -6,6 +6,7 @@ import {
   UseMiddleware,
   Authorized,
 } from "type-graphql";
+import {GraphQLJSONObject} from "graphql-type-json";
 import { Class } from "../entities/Class";
 import ClassController from "../controllers/ClassController";
 import { CreateClassInput, UpdateClassInput } from "./inputs/class-input";
@@ -86,19 +87,28 @@ export class ClassResolver {
   }
 
   // @UseMiddleware(isCorrectUser)
-  @Mutation(() => Boolean)
-  async registerForClass(
-    @Arg("userId") userId: string,
-    @Arg("classId") classId: string,
-    @Arg("scheduledTime") scheduledTime: number
-  ) {
-    return await this.classController.registerForClass(
-      userId,
-      classId,
-      scheduledTime
-    );
-  }
+  // @Mutation(() => Boolean)
+  // async registerForClass(
+  //   @Arg("userId") userId: string,
+  //   @Arg("classId") classId: string,
+  //   @Arg("scheduledTime") scheduledTime: number
+  // ) {
+  //   return await this.classController.registerForClass(
+  //     userId,
+  //     classId,
+  //     scheduledTime
+  //   );
+  // }
 
+    @UseMiddleware(isCorrectUser)
+    @Mutation(() => Boolean)
+    async registerForClass(@Arg("userId", type => GraphQLJSONObject) userId: [string],
+                    @Arg("classId") classId: string,
+                    @Arg("scheduledTime") scheduledTime: number) {
+        return await this.classController.registerForClass(userId, classId, scheduledTime);
+    };
+
+    
   // @UseMiddleware(isCorrectUser)
   @Mutation(() => Boolean)
   async deleteClassById(

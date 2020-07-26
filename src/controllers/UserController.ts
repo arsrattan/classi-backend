@@ -379,7 +379,7 @@ class UserController {
   public async getNumFollowers(userId: string): Promise<number> {
     let num;
     try{
-        num = Number((await this.g.V().has('user','username', userId) .outE('follows').count().next()).value);
+        num = Number((await this.g.V().has('user','username', userId).inE('follows').count().next()).value);
         return num;
     }
     catch(error) {

@@ -1,16 +1,17 @@
 import "reflect-metadata";
-import "source-map-support/register";
-import { buildSchemaSync } from "type-graphql";
-import { ApolloServer } from "apollo-server-lambda";
-// import { ApolloServer } from "apollo-server";
-import { UserResolver } from "./resolvers/UserResolver";
-import { ClassResolver } from "./resolvers/ClassResolver";
-import { PostResolver } from "./resolvers/PostResolver";
-import { userAuthChecker } from "./auth/isAuth";
+import "source-map-support/register"
+import {buildSchemaSync} from "type-graphql";
+import {ApolloServer} from "apollo-server-lambda";
+import {UserResolver} from "./resolvers/UserResolver";
+import {ClassResolver} from "./resolvers/ClassResolver";
+import {PostResolver} from "./resolvers/PostResolver";
+import {GroupResolver} from "./resolvers/GroupResolver";
+import {RegistrationResolver} from "./resolvers/RegistrationResolver";
+import {userAuthChecker} from "./auth/isAuth";
 
 // void (async function bootstrap() {
   const schema = buildSchemaSync({
-    resolvers: [UserResolver, ClassResolver, PostResolver],
+    resolvers: [UserResolver, ClassResolver, PostResolver, RegistrationResolver, GroupResolver],
     validate: false,
     authChecker: userAuthChecker,
   });

@@ -3,7 +3,6 @@ import {User} from "../../entities/User";
 import {IsEmail} from "class-validator";
 import AccountType from "../../enums/AccountType";
 import {GraphQLJSONObject} from "graphql-type-json";
-import {Class} from "../../entities/Class";
 
 @InputType()
 export class UserInput implements Partial<User> {
@@ -32,6 +31,10 @@ export class UserInput implements Partial<User> {
 export class CreateUserInput implements Partial<User> {
     @Field()
     userId: string;
+    @Field()
+    username: string;
+    @Field()
+    dateOfBirth: string;
     @Field({nullable: true})
     @IsEmail()
     email: string;

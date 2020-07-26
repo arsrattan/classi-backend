@@ -18,10 +18,10 @@ export default class Group {
     @Field(_type => GraphQLJSONObject, {nullable: true})
     savedClasses: string[];
     
-    @Field(_type => Registration, {nullable: true})
+    @Field(_type => [Registration], {nullable: true})
     scheduledClasses: Registration[]; // array of class ids 
     
-    @Field(_type => Registration, {nullable: true})
+    @Field(_type => [Registration], {nullable: true})
     pastClasses: Registration[]; //pick any user and scan table for groupId
     
     @Field()

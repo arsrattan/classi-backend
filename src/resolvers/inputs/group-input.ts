@@ -1,6 +1,6 @@
 import {InputType, Field} from "type-graphql";
 import Group from "../../entities/Group";
-import {Registration} from "../../entities/Registration";
+import { Registration } from "../../entities/Registration";
 import { GraphQLJSONObject } from "graphql-type-json";
 
 @InputType()
@@ -17,24 +17,21 @@ export class UpdateGroupInput implements Partial<Group> {
     @Field(_type => GraphQLJSONObject, {nullable: true})
     savedClasses: string[];
     
-    @Field(type => Registration, { nullable: true })
+    @Field(_type => [GraphQLJSONObject], { nullable: true })
     scheduledClasses: Registration[]; 
 }
 
 @InputType()
 export class CreateGroupInput implements Partial<Group> {
     @Field()
-    groupId: string;
-    
-    @Field()
     name: string; 
     
-    @Field()
+    @Field(_type => [String])
     members: string[]; 
     
-    @Field({nullable: true})
+    @Field(_type => GraphQLJSONObject, {nullable: true})
     savedClasses: string[];
     
-    @Field({nullable: true})
+    @Field(_type => [GraphQLJSONObject], {nullable: true})
     scheduledClasses: Registration[]; 
 }

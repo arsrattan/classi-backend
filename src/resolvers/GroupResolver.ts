@@ -9,21 +9,21 @@ export class GroupResolver {
     public groupController: GroupController = new GroupController();
 
     // get group by id
-    @UseMiddleware(isAuth)
+    // @UseMiddleware(isAuth)
     @Query(() => [Group], { nullable: true })
     async getGroupById(@Arg("groupId") groupId: string){
         return await this.groupController.getWorkoutGroupById(groupId);
     };
 
     // create group
-    @UseMiddleware(isAuth)
+    // @UseMiddleware(isAuth)
     @Mutation(() => Boolean)
     async createGroup(@Arg("data") data: CreateGroupInput) {
         return await this.groupController.createGroup(data);
     };
 
     // update group by id
-    @UseMiddleware(isAuth)
+    // @UseMiddleware(isAuth)
     @Mutation(() => Boolean)
     async updateGroupById(@Arg("data", {nullable: true}) data: UpdateGroupInput,
                           @Arg("groupId") groupId: string) {
@@ -31,7 +31,7 @@ export class GroupResolver {
     };
 
     // delete group by id
-    @UseMiddleware(isAuth)
+    // @UseMiddleware(isAuth)
     @Mutation(() => Boolean)
     async deleteGroupById(@Arg("groupId") groupId: string,
                           @Arg("userId") userId: string) {

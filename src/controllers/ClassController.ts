@@ -13,6 +13,7 @@ class ClassController {
     const params = { TableName: "classesTable" };
     try {
       const response = await this.docClient.scan(params).promise();
+      console.log(response);
       return <Class[]>response.Items;
     } catch (err) {
       throw new Error(err);
@@ -194,10 +195,10 @@ class ClassController {
         data['invitedRegistrations'] = [];
         data['registrationId'] = "registration" + uniqid();
         const params = {
-            TableName: "registrationsTable",
+            TableName: "classRegistrationsTable",
             Item: data
         };
-        const promise = this.docClient.put(params).promise();
+        const promise = this.registrationsDocClient.put(params).promise();
         return promise.then(() => true).catch(err => {
             throw new Error(err);
         });

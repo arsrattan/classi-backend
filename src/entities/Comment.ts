@@ -15,6 +15,6 @@ export class Comment {
     createdAt: number;
     @Field({nullable: true})
     parentCommentId: string;
-    @Field(_type => GraphQLJSONObject, {nullable: true})
+    @Field(_type => [String], {nullable: true})
     likes: string[];
 }

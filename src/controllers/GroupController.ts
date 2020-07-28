@@ -1,11 +1,13 @@
 import uniqid from 'uniqid';
 import Group from "../entities/Group";
-// import {Registration} from "../entities/Registration";
+import {Registration} from "../entities/Registration";
+import ClassController from "./ClassController";
 import { createDocumentClient } from "../lib/AWS";
 
 const groupTable = "classi-workout-groups" // move to config file later
 
 class GroupController {
+    private classController: ClassController = new ClassController();
     private docClient = createDocumentClient("Group");
     
     // get workoutGroups by id

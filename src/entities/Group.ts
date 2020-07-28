@@ -12,10 +12,10 @@ export default class Group {
     @Field()
     name: string; //groupName
     
-    @Field(_type => GraphQLJSONObject, {nullable: true})
+    @Field(_type => [String], {nullable: true})
     members: string[]; // array of userIds 
     
-    @Field(_type => GraphQLJSONObject, {nullable: true})
+    @Field(_type => [String], {nullable: true})
     savedClasses: string[];
     
     @Field(_type => [Registration], {nullable: true})

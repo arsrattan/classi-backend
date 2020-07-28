@@ -11,10 +11,10 @@ export class UpdateGroupInput implements Partial<Group> {
     @Field({ nullable: true })
     name: string; 
     
-    @Field(_type => GraphQLJSONObject, {nullable: true})
+    @Field(_type => [String], {nullable: true})
     members: string[]; 
     
-    @Field(_type => GraphQLJSONObject, {nullable: true})
+    @Field(_type => [String], {nullable: true})
     savedClasses: string[];
     
     @Field(_type => [GraphQLJSONObject], { nullable: true })
@@ -29,7 +29,7 @@ export class CreateGroupInput implements Partial<Group> {
     @Field(_type => [String])
     members: string[]; 
     
-    @Field(_type => GraphQLJSONObject, {nullable: true})
+    @Field(_type => [String], {nullable: true})
     savedClasses: string[];
     
     @Field(_type => [GraphQLJSONObject], {nullable: true})

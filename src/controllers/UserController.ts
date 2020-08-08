@@ -13,11 +13,13 @@ import { JWT_SECRET } from "../util/secrets";
 import NotificationType from "../enums/NotificationType";
 import { Notification } from "../entities/Notification";
 import AccountType from "../enums/AccountType";
-import {driver, process, structure} from "gremlin";
+import { driver, process, structure } from "gremlin";
 import { uuid } from "uuidv4";
+import Group from "../entities/Group";
+import GroupController from "../controllers/GroupController";
 
 const {
-    DriverRemoteConnection,
+  DriverRemoteConnection,
 } = driver;
 
 const {
@@ -27,8 +29,11 @@ const {
 const serializer = require('gremlin/lib/structure/io/graph-serializer');
 const writer = new serializer.GraphSON3Writer();
 const graph = new Graph();
+const gController = new GroupController();
 
 class UserController {
+  private groupController = gController;
+
   private g = graph
     .traversal()
     .withRemote(
@@ -181,132 +186,132 @@ class UserController {
       });
   }
 */
-//   public async confirmUser(token: string): Promise<Boolean> {
-//     const decodedToken: AuthData = getDecodedToken(confirmUserPrefix, token);
-//     if (!decodedToken || decodedToken.userId == null)
-//       throw new Error("Not authorized!");
-//     let cypher: string =
-//       'MATCH (n:User) WHERE n.userId = "' +
-//       decodedToken.userId +
-//       '" ' +
-//       "SET n.confirmed = true " +
-//       "RETURN n";
-//     return this.session
-//       .run(cypher)
-//       .then(() => {
-//         return true;
-//       })
-//       .catch((error) => {
-//         throw new Error(error);
-//       });
-//   }
+  //   public async confirmUser(token: string): Promise<Boolean> {
+  //     const decodedToken: AuthData = getDecodedToken(confirmUserPrefix, token);
+  //     if (!decodedToken || decodedToken.userId == null)
+  //       throw new Error("Not authorized!");
+  //     let cypher: string =
+  //       'MATCH (n:User) WHERE n.userId = "' +
+  //       decodedToken.userId +
+  //       '" ' +
+  //       "SET n.confirmed = true " +
+  //       "RETURN n";
+  //     return this.session
+  //       .run(cypher)
+  //       .then(() => {
+  //         return true;
+  //       })
+  //       .catch((error) => {
+  //         throw new Error(error);
+  //       });
+  //   }
 
   public async createUserNotification(data: any): Promise<Boolean> {
     try {
-        const userData = await this.getUserById(data["triggeringUserId"]);
-        const notificationId = uuid();
-        await this.g
-          .addV("notification")
-          .property("notificationId", notificationId)
-          .property("triggeringUserId", data["triggeringUserId"])
-          .property("triggeringUserS3Url", userData[0]["s3url"])
-          .property("createdAt", Date.now().toString())
-          .property("accountType", AccountType.Free)
-          .next();
-  
-          return true;
+      const userData = await this.getUserById(data["triggeringUserId"]);
+      const notificationId = uuid();
+      await this.g
+        .addV("notification")
+        .property("notificationId", notificationId)
+        .property("triggeringUserId", data["triggeringUserId"])
+        .property("triggeringUserS3Url", userData[0]["s3url"])
+        .property("createdAt", Date.now().toString())
+        .property("accountType", AccountType.Free)
+        .next();
 
-      } catch (err) {
-        throw new Error(err);
-      }
+      return true;
+
+    } catch (err) {
+      throw new Error(err);
+    }
   }
 
-//   public async getUserNotifications(userId: string): Promise<Notification[]> {
-//     let notifications: any = [];
-//     let cypher: string =
-//       'Match(u:User)-[:HAS_NOTIFICATION]->(n:Notification) where u.userId = "' +
-//       userId +
-//       '" with n order by n.createdAt limit 10 return n';
-//     return this.session
-//       .run(cypher)
-//       .then((result) => {
-//         result.records.forEach((record) => {
-//           notifications.push(record.toObject()["n"]["properties"]);
-//         });
-//         return notifications;
-//       })
-//       .catch((error) => {
-//         throw new Error(error);
-//       });
-//   }
+  //   public async getUserNotifications(userId: string): Promise<Notification[]> {
+  //     let notifications: any = [];
+  //     let cypher: string =
+  //       'Match(u:User)-[:HAS_NOTIFICATION]->(n:Notification) where u.userId = "' +
+  //       userId +
+  //       '" with n order by n.createdAt limit 10 return n';
+  //     return this.session
+  //       .run(cypher)
+  //       .then((result) => {
+  //         result.records.forEach((record) => {
+  //           notifications.push(record.toObject()["n"]["properties"]);
+  //         });
+  //         return notifications;
+  //       })
+  //       .catch((error) => {
+  //         throw new Error(error);
+  //       });
+  //   }
 
-//   public async changePassword(
-//     token: string,
-//     password: string
-//   ): Promise<Boolean> {
-//     const decodedToken: AuthData = getDecodedToken(forgotPasswordPrefix, token);
-//     if (!decodedToken || decodedToken.userId == null)
-//       throw new Error("Not authorized!");
-//     const hashedPassword = await this.hashPassword(password);
-//     if (hashedPassword !== null) {
-//       let cypher: string =
-//         'MATCH (n:User) WHERE n.userId = "' +
-//         decodedToken.userId +
-//         '" ' +
-//         'SET n.password = "' +
-//         hashedPassword +
-//         '" ' +
-//         "RETURN n";
-//       return this.session
-//         .run(cypher)
-//         .then(() => {
-//           return true;
-//         })
-//         .catch((error) => {
-//           throw new Error(error);
-//         });
-//     }
-//   }
+  //   public async changePassword(
+  //     token: string,
+  //     password: string
+  //   ): Promise<Boolean> {
+  //     const decodedToken: AuthData = getDecodedToken(forgotPasswordPrefix, token);
+  //     if (!decodedToken || decodedToken.userId == null)
+  //       throw new Error("Not authorized!");
+  //     const hashedPassword = await this.hashPassword(password);
+  //     if (hashedPassword !== null) {
+  //       let cypher: string =
+  //         'MATCH (n:User) WHERE n.userId = "' +
+  //         decodedToken.userId +
+  //         '" ' +
+  //         'SET n.password = "' +
+  //         hashedPassword +
+  //         '" ' +
+  //         "RETURN n";
+  //       return this.session
+  //         .run(cypher)
+  //         .then(() => {
+  //           return true;
+  //         })
+  //         .catch((error) => {
+  //           throw new Error(error);
+  //         });
+  //     }
+  //   }
 
-//   public async forgotPassword(email: string): Promise<Boolean> {
-//     return this.session
-//       .run("MATCH (n { email: '" + email + "' }) RETURN n")
-//       .then((result) => {
-//         if (result.records.length !== 1) {
-//           return true; //dont want to notify that the email doesnt exist for security reasons
-//         }
-//         const user = result.records[0].toObject()["n"]["properties"];
-//         const token =
-//           forgotPasswordPrefix +
-//           jwt.sign({ userId: user.userId }, JWT_SECRET, { expiresIn: "1h" });
-//         const url = `http://localhost:3000/user/change-password/${token}`;
-//         sendEmail(email, url);
-//         return true;
-//       })
-//       .catch((error) => {
-//         throw new Error(error);
-//       });
-//   }
+  //   public async forgotPassword(email: string): Promise<Boolean> {
+  //     return this.session
+  //       .run("MATCH (n { email: '" + email + "' }) RETURN n")
+  //       .then((result) => {
+  //         if (result.records.length !== 1) {
+  //           return true; //dont want to notify that the email doesnt exist for security reasons
+  //         }
+  //         const user = result.records[0].toObject()["n"]["properties"];
+  //         const token =
+  //           forgotPasswordPrefix +
+  //           jwt.sign({ userId: user.userId }, JWT_SECRET, { expiresIn: "1h" });
+  //         const url = `http://localhost:3000/user/change-password/${token}`;
+  //         sendEmail(email, url);
+  //         return true;
+  //       })
+  //       .catch((error) => {
+  //         throw new Error(error);
+  //       });
+  //   }
 
   public async getAllUsers(): Promise<User[]> {
     let data;
     let users = [];
-    try{
-        data = await this.g.V().hasLabel('user').valueMap().toList();
-        const res = JSON.parse(writer.write(data));
-        for(let u of res['@value']){
-            let user = {};
-            for(let i=0; i < u['@value'].length; i++){
-                if(typeof u['@value'][i] === 'string'){
-                    user[u['@value'][i]] = u['@value'][i + 1]['@value'][0]
-                }
-            }
-            users.push(user);
+    try {
+      data = await this.g.V().hasLabel('user').valueMap().toList();
+      const res = JSON.parse(writer.write(data));
+      for (let u of res['@value']) {
+        let user = {};
+        for (let i = 0; i < u['@value'].length; i++) {
+          if (typeof u['@value'][i] === 'string') {
+            user[u['@value'][i]] = u['@value'][i + 1]['@value'][0]
+          }
         }
-        
+        users.push(user);
+      }
+
     }
-    catch(error) {
-        throw new Error(error);
+    catch (error) {
+      throw new Error(error);
     }
     return users;
   }
@@ -314,20 +319,20 @@ class UserController {
   public async getUserById(username: string, email?: string): Promise<User> {
     let data;
     let user: any = {};
-    try{
-        data = await this. g.V().has('user','username', username).valueMap().toList();
-        const res = JSON.parse(writer.write(data));
-        console.log(res);
-        for(let u of res['@value']){
-            for(let i=0; i < u['@value'].length; i++){
-                if(typeof u['@value'][i] === 'string'){
-                    user[u['@value'][i]] = u['@value'][i + 1]['@value'][0]
-                }
-            }
+    try {
+      data = await this.g.V().has('user', 'username', username).valueMap().toList();
+      const res = JSON.parse(writer.write(data));
+      console.log(res);
+      for (let u of res['@value']) {
+        for (let i = 0; i < u['@value'].length; i++) {
+          if (typeof u['@value'][i] === 'string') {
+            user[u['@value'][i]] = u['@value'][i + 1]['@value'][0]
+          }
         }
+      }
     }
-    catch(error) {
-        throw new Error(error);
+    catch (error) {
+      throw new Error(error);
     }
     return user;
   }
@@ -335,21 +340,21 @@ class UserController {
   public async getUserFollowers(userId: string): Promise<User[]> {
     let data;
     let users: any = [];
-    try{
-        data = await this.g.V().has('user','username', userId).in_('follows').valueMap().toList();
-        const res = JSON.parse(writer.write(data));
-        for(let u of res['@value']){
-            let user = {};
-            for(let i=0; i < u['@value'].length; i++){
-                if(typeof u['@value'][i] === 'string'){
-                    user[u['@value'][i]] = u['@value'][i + 1]['@value'][0]
-                }
-            }
-            users.push(user);
+    try {
+      data = await this.g.V().has('user', 'username', userId).in_('follows').valueMap().toList();
+      const res = JSON.parse(writer.write(data));
+      for (let u of res['@value']) {
+        let user = {};
+        for (let i = 0; i < u['@value'].length; i++) {
+          if (typeof u['@value'][i] === 'string') {
+            user[u['@value'][i]] = u['@value'][i + 1]['@value'][0]
+          }
         }
+        users.push(user);
+      }
     }
-    catch(error) {
-        throw new Error(error);
+    catch (error) {
+      throw new Error(error);
     }
     return users;
   }
@@ -357,33 +362,33 @@ class UserController {
   public async getUserFollowing(userId: string): Promise<User[]> {
     let data;
     let users: any = [];
-    try{
-        data = await this.g.V().has('user','username', userId).out('follows').valueMap().toList();
-        const res = JSON.parse(writer.write(data));
-        for(let u of res['@value']){
-            let user = {};
-            for(let i=0; i < u['@value'].length; i++){
-                if(typeof u['@value'][i] === 'string'){
-                    user[u['@value'][i]] = u['@value'][i + 1]['@value'][0]
-                }
-            }
-            users.push(user);
+    try {
+      data = await this.g.V().has('user', 'username', userId).out('follows').valueMap().toList();
+      const res = JSON.parse(writer.write(data));
+      for (let u of res['@value']) {
+        let user = {};
+        for (let i = 0; i < u['@value'].length; i++) {
+          if (typeof u['@value'][i] === 'string') {
+            user[u['@value'][i]] = u['@value'][i + 1]['@value'][0]
+          }
         }
+        users.push(user);
+      }
     }
-    catch(error) {
-        throw new Error(error);
+    catch (error) {
+      throw new Error(error);
     }
     return users;
   }
 
   public async getNumFollowers(userId: string): Promise<number> {
     let num;
-    try{
-        num = Number((await this.g.V().has('user','username', userId).outE('follows').count().next()).value);
-        return num;
+    try {
+      num = Number((await this.g.V().has('user', 'username', userId).outE('follows').count().next()).value);
+      return num;
     }
-    catch(error) {
-        throw new Error(error);
+    catch (error) {
+      throw new Error(error);
     }
   }
 
@@ -393,55 +398,129 @@ class UserController {
     isUnfollow: boolean
   ): Promise<Boolean> {
     if (userId !== followedUser) {
-        try{
-            if(!isUnfollow){
-                await this.g.V()
-                .has('user','username', userId)
-                .addE('follows')
-                .to(this.g.V().has('user','username', followedUser)).next();
-            }
-            else {
-                await this.g.V()
-                .has('user','username', userId)
-                .outE('follows')
-                .where(this.g.V().has('user','username', followedUser)).drop().next();
-            }
-            return true;
+      try {
+        if (!isUnfollow) {
+          await this.g.V()
+            .has('user', 'username', userId)
+            .addE('follows')
+            .to(this.g.V().has('user', 'username', followedUser)).next();
         }
-        catch(error) {
-            throw new Error(error);
+        else {
+          await this.g.V()
+            .has('user', 'username', userId)
+            .outE('follows')
+            .where(this.g.V().has('user', 'username', followedUser)).drop().next();
         }
-        
+        return true;
+      }
+      catch (error) {
+        throw new Error(error);
+      }
+
     }
   }
 
-//   public async updateUser(userId: string, data: any): Promise<Boolean> {
-//     let cypher = "MERGE (n:User { userId: '" + userId + "' }) SET";
-//     const keys = Object.keys(data);
-//     for (let i = 0; i < keys.length; i++) {
-//       cypher += " n." + keys[i] + " = '" + data[keys[i]] + "'";
-//       if (!(i == keys.length - 1)) cypher += ",";
-//     }
-//     cypher += " RETURN n";
-//     return this.session
-//       .run(cypher)
-//       .then(() => {
-//         return true;
-//       })
-//       .catch((error) => {
-//         throw new Error(error);
-//       });
-//   }
+  //   public async updateUser(userId: string, data: any): Promise<Boolean> {
+  //     let cypher = "MERGE (n:User { userId: '" + userId + "' }) SET";
+  //     const keys = Object.keys(data);
+  //     for (let i = 0; i < keys.length; i++) {
+  //       cypher += " n." + keys[i] + " = '" + data[keys[i]] + "'";
+  //       if (!(i == keys.length - 1)) cypher += ",";
+  //     }
+  //     cypher += " RETURN n";
+  //     return this.session
+  //       .run(cypher)
+  //       .then(() => {
+  //         return true;
+  //       })
+  //       .catch((error) => {
+  //         throw new Error(error);
+  //       });
+  //   }
 
   public async deleteUserById(userId: string): Promise<Boolean> {
-    try{
-        await this.g.V().has('user','username', userId).drop();
-        return true;
+    try {
+      await this.g.V().has('user', 'username', userId).drop();
+      return true;
     }
-    catch(error) {
-        throw new Error(error);
+    catch (error) {
+      throw new Error(error);
     }
   }
+
+  // returns the all of the user's Groups 
+  public async getUserGroupsById(userId: string): Promise<Group[]> {
+    const user = await this.getUserById(userId);
+    const groups: string[] = user[0].userGroups;
+    return this.groupController.batchGetWorkoutGroupByIds(groups);
+  }
+
+  // adds a group to the user's groups list
+  public async addGroupById(userId: string, groupId: string): Promise<Boolean> {
+    const user = await this.getUserById(userId);
+    const groupsList: string[] = user[0].userGroups;
+
+    if (!groupsList.includes(groupId)) {
+      groupsList.push(groupId);
+      // call neo4j to update
+      const data = { userGroups: groupsList };
+      try {
+        await this.updateUser(userId, data);
+        return true;
+      } catch (err) {
+        console.log(`Could not add ${groupId} to ${userId}'s groups`)
+        return false;
+      }
+
+    } else if (groupsList.includes(groupId)) {
+      console.log(`${userId} is already is part of ${groupId}`);
+      return true;
+    }
+
+    console.log(`Could not add ${groupId} to ${userId}'s groups`);
+    return false;
+  }
+
+  // adds group to all users' groups list 
+  public async batchAddGroupById(userIds: string[], groupId): Promise<Boolean> {
+    const addGroupsPromises = userIds.map(id =>
+      this.addGroupById(id, groupId));
+    try {
+      await Promise.all(addGroupsPromises);
+      return true;
+    } catch (err) {
+      console.log(err)
+    }
+
+  }
+
+  // deletes a group from a user's group list
+  public async deleteGroupById(userId: string, groupId: string): Promise<Boolean> {
+    const user = await this.getUserById(userId);
+    const groupsList: string[] = user[0].userGroups;
+
+    if (groupsList.includes(groupId)) {
+      const removeGroups = groupsList.filter(function (value) {
+        return value !== groupId
+      })
+      // update neo4j
+      const data = { userGroups: removeGroups };
+      try {
+        await this.updateUser(userId, data);
+        return true;
+      } catch (err) {
+        console.log(`Could not remove ${groupId} from ${userId}'s groups`)
+        return false;
+      }
+
+    } else if (!groupsList.includes(groupId)) {
+      console.log(`${groupId} is not part of ${userId}'s groups`);
+      return true;
+    }
+    console.log(`Could not delete ${groupId} from ${userId} for some other reason`);
+    return false;
+  }
+
 }
 
 export default UserController;

@@ -3,11 +3,13 @@ import { Class } from "../entities/Class";
 import { createDocumentClient } from "../lib/AWS";
 import NotificationType from "../enums/NotificationType";
 import UserController from "./UserController";
+import RegistrationController from "./RegistrationController";
 
 class ClassController {
   private docClient = createDocumentClient("Class");
   private registrationsDocClient = createDocumentClient("Registration");
   private userController: UserController = new UserController();
+  private registrationController: RegistrationController = new RegistrationController();
 
   public async getAllClasses(): Promise<Class[]> {
     const params = { TableName: "classesTable" };
@@ -16,6 +18,7 @@ class ClassController {
       console.log(response);
       return <Class[]>response.Items;
     } catch (err) {
+      console.log(err);
       throw new Error(err);
     }
   }
@@ -32,6 +35,22 @@ class ClassController {
       .catch((err) => {
         throw new Error(err);
       });
+  }
+
+  public async getUpcomingClassesForUser(username: string): Promise<Class[]> {
+    // const registrations = await this.registrationController.getRegistrationsForUser(username);
+    // const params = { TableName: "classesTable" };
+    // try {
+    //   const response = await this.docClient.scan(params).promise();
+    //   for(let r of registrations){
+    //     r.classId
+    //   }
+    //   return <Class[]>response.Items;
+    // } catch (err) {
+    //   console.log(4);
+    //   throw new Error(err);
+    // }
+    return null;
   }
 
   public async createClass(data: any): Promise<Boolean> {
@@ -186,11 +205,11 @@ class ClassController {
       });
   }
 
-    public async registerForClass(userId: string[], classId: string, scheduledTime: number): Promise<Boolean> {
+    public async registerForClass(userId: string, classId: string, scheduledTime: number): Promise<Boolean> {
         let data = {};
         data['scheduledTime'] = scheduledTime
         data['createdAt'] = Date.now();
-        data['userId'] = userId;
+        data['username'] = userId;
         data['classId'] = classId;
         data['invitedRegistrations'] = [];
         data['registrationId'] = "registration" + uniqid();

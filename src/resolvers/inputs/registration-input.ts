@@ -4,7 +4,7 @@ import {Registration} from "../../entities/Registration";
 @InputType()
 export class RegistrationInput implements Partial<Registration> {
     @Field({nullable: true})
-    userId: string
+    username: string
     @Field({nullable: true})
     groupId: string;
     @Field({nullable: true})

@@ -24,6 +24,12 @@ export class ClassResolver {
   }
 
   // @UseMiddleware(isAuth)
+  @Query(() => [Class], { nullable: true })
+  async getUpcomingClassesForUser(@Arg("username") username: string) {
+    return await this.classController.getUpcomingClassesForUser(username);
+  }
+
+  // @UseMiddleware(isAuth)
   // @Authorized()
   @Query(() => [Class], { nullable: true })
   async getAllClasses() {
@@ -88,7 +94,7 @@ export class ClassResolver {
 
     // @UseMiddleware(isCorrectUser)
     @Mutation(() => Boolean)
-    async registerForClass(@Arg("userId", _type => [String]) userId: string[],
+    async registerForClass(@Arg("userId") userId: string,
                     @Arg("classId") classId: string,
                     @Arg("scheduledTime") scheduledTime: number) {
         return await this.classController.registerForClass(userId, classId, scheduledTime);

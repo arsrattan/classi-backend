@@ -51,3 +51,4 @@ functions:
           path: graphql
           method: GET
           cors: true
+      - cloudwatchLog: '/aws/lambda/classi-backend-dev-graphql'

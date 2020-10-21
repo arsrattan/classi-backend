@@ -1,10 +1,12 @@
 import uniqid from 'uniqid';
 import {createDocumentClient} from "../lib/AWS";
 import {Registration} from "../entities/Registration";
+import UserController from "./UserController";
 
 
 class RegistrationController{
     private docClient = createDocumentClient("Registration");
+    private userController: UserController = new UserController();
 
     public async getRegistrationById(registrationId: string): Promise<Registration[]> {
         const params = {
@@ -13,6 +15,19 @@ class RegistrationController{
             ExpressionAttributeValues: {':i': registrationId}
         };
         const promise = this.docClient.query(params).promise();
+        return promise.then(res => <Registration[]> res.Items).catch(err => {
+            throw new Error(err);
+        });
+    };
+
+    public async getRegistrationsForUser(username: string): Promise<Registration[]> {
+        const params = {
+            TableName: "classRegistrationsTable",
+            FilterExpression: '#username = :username',
+            ExpressionAttributeNames: {'#username': 'username'},
+            ExpressionAttributeValues: {':username': username},
+        };
+        const promise = this.docClient.scan(params).promise();
         return promise.then(res => <Registration[]> res.Items).catch(err => {
             throw new Error(err);
         });

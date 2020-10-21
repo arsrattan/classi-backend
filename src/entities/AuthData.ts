@@ -5,7 +5,7 @@ export class AuthData {
     @Field()
     accessToken: string;
     @Field()
-    userId: string;
+    username: string;
     @Field()
     expirationInHours: number;
 }

@@ -9,19 +9,25 @@ export class RegistrationResolver {
 
     public registrationController: RegistrationController = new RegistrationController();
 
-    @UseMiddleware(isAuth)
+    // @UseMiddleware(isAuth)
     @Query(() => [Registration], { nullable: true })
     async getRegistrationById(@Arg("registrationId") registrationId: string){
         return await this.registrationController.getRegistrationById(registrationId);
     };
 
-    @UseMiddleware(isAuth)
+    // @UseMiddleware(isAuth)
+    @Query(() => [Registration], { nullable: true })
+    async getRegistrationsForUser(@Arg("username") username: string){
+        return await this.registrationController.getRegistrationsForUser(username);
+    };
+
+    // @UseMiddleware(isAuth)
     @Mutation(() => Boolean)
     async createRegistration(@Arg("data") data: RegistrationInput) {
         return await this.registrationController.createRegistration(data);
     };
 
-    @UseMiddleware(isCorrectUser)
+    // @UseMiddleware(isCorrectUser)
     @Mutation(() => Boolean)
     async updateRegistrationById(@Arg("data", {nullable: true}) data: RegistrationInput,
                          @Arg("registrationId") registrationId: string,
@@ -29,7 +35,7 @@ export class RegistrationResolver {
         return await this.registrationController.updateRegistrationById(registrationId, data);
     };
 
-    @UseMiddleware(isCorrectUser)
+    // @UseMiddleware(isCorrectUser)
     @Mutation(() => Boolean)
     async deleteRegistration(@Arg("registrationId") registrationId: string,
                      @Arg("userId") userId: string) {

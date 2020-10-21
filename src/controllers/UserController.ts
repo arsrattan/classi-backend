@@ -50,13 +50,24 @@ class UserController {
   }
 
   public async login(username: string, password: string): Promise<AuthData> {
-    const data = await this.g.V().limit(1).count().next();
-    console.log(`Data: ${data}`);
-    return {
-      accessToken: "",
-      userId: "",
-      expirationInHours: 1,
-    };
+    const user = await this.getUserById(username);
+    console.log(`Data: ${user.password}`);
+    const isEqual = bcrypt.compareSync(password, user.password);
+        if (!isEqual) {
+          throw new Error("Incorrect password!");
+        }
+        else {
+          const token = jwt.sign(
+            { userId: user.username, email: user.email },
+            JWT_SECRET,
+            { expiresIn: "1h" }
+          );
+          return {
+            accessToken: token,
+            username: user.username,
+            expirationInHours: 1,
+          };
+        }
   }
 
   private async emailBelongsToExistingUser(email: string) {
@@ -101,7 +112,7 @@ class UserController {
     username: string,
     password: string,
     dateOfBirth: string
-  ) {
+  ): Promise<Boolean> {
     if ((await this.emailBelongsToExistingUser(email)) === true) {
       throw new Error(
         "The provided email address has already been used to register for another account"
@@ -112,17 +123,8 @@ class UserController {
         "The provided username has already been used to register for another account"
       );
     }
-
-    let encryptedPassword;
-    await bcrypt.hash(password, 10, (err, hash) => {
-      if (err) {
-        throw new Error(`Could not hash password: ${err.message}`);
-      }
-      encryptedPassword = hash;
-    });
-
-    console.log(`Encrypted password: ${encryptedPassword}`);
-
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(password, salt);  
     try {
       const userId = uuid();
       await this.g
@@ -132,19 +134,16 @@ class UserController {
         .property("firstName", firstName)
         .property("lastName", lastName)
         .property("username", username)
-        .property("password", encryptedPassword)
+        .property("password", hash)
         .property("dateOfBirth", dateOfBirth)
         .property("dateCreated", Date.now().toString())
         .property("accountType", AccountType.Free)
         .next();
+      return true;
 
-      const token =
-        confirmUserPrefix +
-        jwt.sign({ userId }, JWT_SECRET, { expiresIn: "1h" });
-
-      console.log(`Generated token: ${token}`);
     } catch (err) {
       console.log("Could not register new user", err);
+      return false;
     }
   }
 

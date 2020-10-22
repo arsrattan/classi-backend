@@ -25,7 +25,7 @@ provider:
       - sg-06b8459f3d7d4ade5
     subnetIds:
       - subnet-03871e84435680f08
-      - subnet-0d47f36b46dc59b49
+      - subnet-001a26d5cf81f51a7
       - subnet-05910b397d8574054
   iamRoleStatements: # permissions for all of your functions can be set here
     - Effect: Allow
